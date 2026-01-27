@@ -93,13 +93,14 @@ model Dispute {
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  payments      Payment[]
-  caseMessages  CaseMessage[]
-  caseStrategy  CaseStrategy?
-  documentPlan  DocumentPlan?
-  caseEvents    CaseEvent[]
-  notifications Notification[]
-  evidenceItems EvidenceItem[]
+  payments          Payment[]
+  caseMessages      CaseMessage[]
+  caseStrategy      CaseStrategy?
+  documentPlan      DocumentPlan?
+  generatedDocuments GeneratedDocument[]
+  caseEvents        CaseEvent[]
+  notifications     Notification[]
+  evidenceItems     EvidenceItem[]
 
   @@index([userId])
   @@index([status])
@@ -225,13 +226,14 @@ model DocumentPlan {
 // Individual documents within a plan (content generated in Block 3C)
 model GeneratedDocument {
   id           String        @id @default(cuid())
-  planId       String
+  planId       String?       // Optional - may not always have a plan
+  caseId       String?       // Direct reference for easier queries
   
   // Document metadata
   type         String        // Extensible document type (not enum)
   title        String
-  description  String
-  order        Int           // Display/generation order
+  description  String?       @default("")
+  order        Int?          @default(0)
   required     Boolean       @default(true)
   
   // Generation status
@@ -253,9 +255,11 @@ model GeneratedDocument {
   updatedAt    DateTime      @updatedAt
   
   // Relations
-  plan         DocumentPlan  @relation(fields: [planId], references: [id], onDelete: Cascade)
+  case         Dispute?      @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  plan         DocumentPlan? @relation(fields: [planId], references: [id], onDelete: Cascade)
   events       CaseEvent[]
   
+  @@index([caseId])
   @@index([planId])
   @@index([status])
   @@index([order]) // For ordered retrieval
