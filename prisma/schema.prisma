@@ -1,0 +1,405 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// User model - synced with Clerk
+model User {
+  id        String   @id @default(cuid())
+  clerkId   String   @unique // Clerk user ID
+  email     String   @unique
+  firstName String?
+  lastName  String?
+  imageUrl  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  disputes Dispute[]
+  payments Payment[]
+  notifications Notification[]
+
+  @@index([clerkId])
+  @@index([email])
+}
+
+// Dispute status enum
+enum DisputeStatus {
+  DRAFT
+  SUBMITTED
+  IN_REVIEW
+  RESOLVED
+  CLOSED
+}
+
+// Case mode enum - how the case is being handled
+enum CaseMode {
+  QUICK  // Traditional wizard submission
+  GUIDED // Conversational AI-assisted mode
+}
+
+// Conversation status enum - chat state (separate from dispute lifecycle)
+enum ConversationStatus {
+  OPEN    // Active conversation, can chat
+  WAITING // User needs to provide info or take action
+  CLOSED  // Conversation complete
+}
+
+// Phase 8.2.2 - Case Lifecycle Status
+// System-owned status tracking for deadline management
+enum CaseLifecycleStatus {
+  DRAFT
+  DOCUMENT_SENT
+  AWAITING_RESPONSE
+  RESPONSE_RECEIVED
+  DEADLINE_MISSED
+  CLOSED
+}
+
+// Dispute model - minimal and extensible
+model Dispute {
+  id          String        @id @default(cuid())
+  title       String
+  description String        @db.Text
+  type        String        // e.g. speeding_ticket, landlord, parking, benefits, immigration
+  status      DisputeStatus @default(DRAFT)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  // Evidence and AI analysis
+  evidenceFiles    Json?   // Array of file metadata {name, size, type, url}
+  aiPreview        Json?   // AI preview data {summary, keyPoints, strength}
+  aiFullAnalysis   Json?   // Full AI analysis (after unlock) {fullLetter, legalGrounds, legalReferences, nextSteps}
+  strengthScore    String? // "weak" | "moderate" | "strong"
+
+  // Phase 7.1 - Conversational Case AI
+  mode                 CaseMode             @default(QUICK)
+  conversationStatus   ConversationStatus?  // NULL for QUICK mode cases
+  restricted           Boolean              @default(false) // If true, AI disabled, only lawyer escalation allowed
+
+  // Phase 8.2.2 - Waiting States & Deadline Engine
+  lifecycleStatus      CaseLifecycleStatus  @default(DRAFT)
+  waitingUntil         DateTime?            // Deadline for response
+
+  // Phase 8.2.5 - System-Owned Decision Gate
+  strategyLocked       Boolean              @default(false) // System-only flag, marks strategy as complete and documents ready to generate
+
+  // Relations
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  payments      Payment[]
+  caseMessages  CaseMessage[]
+  caseStrategy  CaseStrategy?
+  documentPlan  DocumentPlan?
+  caseEvents    CaseEvent[]
+  notifications Notification[]
+  evidenceItems EvidenceItem[]
+
+  @@index([userId])
+  @@index([status])
+  @@index([type])
+  @@index([createdAt])
+  @@index([mode])
+  @@index([conversationStatus])
+  @@index([lifecycleStatus])
+  @@index([waitingUntil])
+}
+
+// Payment status enum
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+}
+
+// Payment model - single source of truth for unlock status
+model Payment {
+  id              String        @id @default(cuid())
+  userId          String
+  disputeId       String
+  stripeSessionId String        @unique
+  stripePaymentId String?
+  amount          Int           // Amount in pence (999 = £9.99)
+  currency        String        @default("gbp")
+  status          PaymentStatus @default(PENDING)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  dispute Dispute @relation(fields: [disputeId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([disputeId])
+  @@index([stripeSessionId])
+  @@index([status])
+}
+
+// Message intent enum - categorizes conversation messages
+enum MessageIntent {
+  QUESTION    // User asking for information
+  ANSWER      // AI providing information
+  INSTRUCTION // User giving directions/commands
+  UPDATE      // Status or case information updates
+}
+
+// Message role enum - who sent the message
+enum MessageRole {
+  USER
+  AI
+}
+
+// CaseMessage model - conversation memory for AI chat
+model CaseMessage {
+  id        String        @id @default(cuid())
+  caseId    String        // Links to Dispute (semantic naming for conversational context)
+  role      MessageRole
+  content   String        @db.Text
+  intent    MessageIntent
+  createdAt DateTime      @default(now())
+
+  case Dispute @relation(fields: [caseId], references: [id], onDelete: Cascade)
+
+  @@index([caseId])
+  @@index([createdAt])
+  @@index([role])
+}
+
+// Phase 7.2 - Case Strategy model
+// Built incrementally from conversation, updated server-side only
+model CaseStrategy {
+  id        String   @id @default(cuid())
+  caseId    String   @unique // One strategy per case
+  
+  // Core strategy fields (extracted from conversation)
+  disputeType       String?  // Controlled vocabulary: parking_ticket, landlord, etc.
+  keyFacts          Json     // Array of strings: ["Fact 1", "Fact 2", ...]
+  evidenceMentioned Json     // Array of strings: ["Photo of ticket", "Receipt", ...]
+  desiredOutcome    String?  // User's stated goal
+  
+  // Metadata
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Relations
+  case Dispute @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  
+  @@index([caseId])
+}
+
+// Phase 7.2 Block 3B - Document Plan model
+// Persisted plan for document generation (created explicitly via POST)
+model DocumentPlan {
+  id              String   @id @default(cuid())
+  caseId          String   @unique // One plan per case (idempotent)
+  
+  // Classification
+  complexity      CaseComplexity
+  complexityScore Int
+  
+  // Complexity breakdown with version (stored as JSON for transparency)
+  // Structure: { version: "1.0", disputeTypeScore, factCountScore, ... }
+  complexityBreakdown Json
+  
+  // Document structure type
+  documentType    DocumentStructureType
+  
+  // Metadata
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  // Relations
+  case      Dispute             @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  documents GeneratedDocument[]
+  
+  @@index([caseId])
+  @@index([complexity])
+}
+
+// Phase 7.2 Block 3B - Generated Document model
+// Individual documents within a plan (content generated in Block 3C)
+model GeneratedDocument {
+  id           String        @id @default(cuid())
+  planId       String
+  
+  // Document metadata
+  type         String        // Extensible document type (not enum)
+  title        String
+  description  String
+  order        Int           // Display/generation order
+  required     Boolean       @default(true)
+  
+  // Generation status
+  status       DocumentStatus @default(PENDING)
+  
+  // Block 3C: PDF storage
+  fileUrl      String?       // Supabase Storage URL
+  retryCount   Int           @default(0)
+  lastError    String?       @db.Text
+  
+  // Phase 8.2.3: Follow-up tracking
+  isFollowUp   Boolean       @default(false)
+  
+  // Legacy field (deprecated - not used in Block 3C)
+  content      String?       @db.Text
+  
+  // Metadata
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  
+  // Relations
+  plan         DocumentPlan  @relation(fields: [planId], references: [id], onDelete: Cascade)
+  events       CaseEvent[]
+  
+  @@index([planId])
+  @@index([status])
+  @@index([order]) // For ordered retrieval
+}
+
+// Enums for document system
+enum CaseComplexity {
+  SIMPLE
+  COMPLEX
+}
+
+enum DocumentStructureType {
+  SINGLE_LETTER
+  MULTI_DOCUMENT_DOCKET
+}
+
+enum DocumentStatus {
+  PENDING      // Not yet generated (Block 3C)
+  GENERATING   // Currently being generated
+  COMPLETED    // Successfully generated
+  FAILED       // Generation failed
+}
+
+// Phase 8.2.1 - Case Timeline Engine
+// Immutable event log for case history
+model CaseEvent {
+  id          String   @id @default(cuid())
+  caseId      String
+  
+  // Event details
+  type        CaseEventType
+  description String
+  
+  // Optional relation to document
+  relatedDocumentId String?
+  relatedDocument   GeneratedDocument? @relation(fields: [relatedDocumentId], references: [id])
+  
+  // Timestamps
+  occurredAt  DateTime
+  createdAt   DateTime @default(now())
+  
+  // Relations
+  case        Dispute @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  
+  @@index([caseId])
+  @@index([type])
+  @@index([occurredAt])
+}
+
+// Phase 8.2.1 - Case Event Types
+// All types defined upfront for future blocks
+enum CaseEventType {
+  DOCUMENT_GENERATED
+  DOCUMENT_SENT
+  RESPONSE_RECEIVED
+  DEADLINE_SET
+  DEADLINE_MISSED
+  FOLLOW_UP_GENERATED
+  ESCALATION_TRIGGERED
+  CASE_CLOSED
+  STRATEGY_FINALISED        // Phase 8.2.5 - Strategy locked
+  DOCUMENT_PLAN_CREATED     // Phase 8.2.5 - Document plan created
+  DOCUMENTS_GENERATING      // Phase 8.2.5 - Batch generation started
+  EVIDENCE_UPLOADED         // Phase 8.5 - Evidence uploaded
+  EVIDENCE_ATTACHED_TO_DOCUMENT // Phase 8.5 - Evidence attached to document
+}
+
+// Phase 8.4 - Notification Types
+// System-driven notifications for user signals
+enum NotificationType {
+  DOCUMENT_READY
+  DOCUMENT_SENT
+  DEADLINE_APPROACHING
+  DEADLINE_MISSED
+  FOLLOW_UP_GENERATED
+  CASE_CLOSED
+}
+
+// Phase 8.4 - Notification model
+// System-generated notifications for user awareness
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  caseId    String
+  
+  // Notification details
+  type      NotificationType
+  message   String
+  read      Boolean          @default(false)
+  
+  // Metadata
+  createdAt DateTime         @default(now())
+  
+  // Relations
+  user      User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  case      Dispute         @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  
+  @@index([userId])
+  @@index([caseId])
+  @@index([read])
+  @@index([createdAt])
+  @@index([type])
+  // Composite index for deduplication
+  @@index([caseId, type, createdAt])
+}
+
+// Phase 8.5 - Evidence Type enum
+// File types for evidence items
+enum EvidenceType {
+  IMAGE    // JPG, PNG
+  PDF      // PDF documents
+}
+
+// Phase 8.5 - Evidence Item model
+// Court-grade evidence management with permanent index numbers
+model EvidenceItem {
+  id          String       @id @default(cuid())
+  caseId      String
+  
+  // File storage
+  fileUrl     String       // Supabase Storage URL
+  fileType    EvidenceType
+  fileName    String       // Original file name
+  fileSize    Int          // File size in bytes
+  
+  // Evidence metadata
+  title       String       // User-provided title
+  description String?      @db.Text // Optional description
+  evidenceDate DateTime?   // Date the evidence relates to
+  
+  // Permanent index (immutable once assigned)
+  evidenceIndex Int        // Evidence Item #1, #2, etc.
+  
+  // Timestamps
+  uploadedAt  DateTime     @default(now())
+  uploadedBy  String       // User ID who uploaded
+  
+  // Relations
+  case        Dispute      @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  
+  @@index([caseId])
+  @@index([evidenceIndex])
+  @@index([uploadedAt])
+  // Unique index per case (evidence numbering)
+  @@unique([caseId, evidenceIndex])
+}
+
