@@ -17,12 +17,16 @@ export function GenerateDocumentsButton({
   onGenerationStarted,
 }: GenerateDocumentsButtonProps) {
   const [isGenerating, setIsGenerating] = useState(false);
+  
+  console.log("[Generate Button] Rendered - Case ID:", caseId, "Locked:", isLocked);
 
   const handleGenerate = async () => {
+    console.log("[Generate Button] Clicked! Case ID:", caseId);
     setIsGenerating(true);
     toast.loading("Starting document generation...");
 
     try {
+      console.log("[Generate Button] Calling trigger-gate API...");
       const response = await fetch("/api/admin/trigger-gate", {
         method: "POST",
         headers: {
@@ -31,15 +35,22 @@ export function GenerateDocumentsButton({
         body: JSON.stringify({ caseId }),
       });
 
+      console.log("[Generate Button] Response status:", response.status);
+
       if (!response.ok) {
         const data = await response.json();
+        console.error("[Generate Button] Error response:", data);
         throw new Error(data.error || "Failed to generate documents");
       }
+
+      const result = await response.json();
+      console.log("[Generate Button] Success:", result);
 
       toast.dismiss();
       toast.success("Document generation started!");
       onGenerationStarted?.();
     } catch (error) {
+      console.error("[Generate Button] Exception:", error);
       toast.dismiss();
       toast.error(error instanceof Error ? error.message : "Failed to generate documents");
     } finally {
