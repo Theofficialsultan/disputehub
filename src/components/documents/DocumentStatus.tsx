@@ -72,17 +72,149 @@ export function DocumentStatus({ caseId }: DocumentStatusProps) {
   const generatingDocs = documents.filter(d => d.status === "GENERATING" || d.status === "PENDING").length;
   const progressPercent = totalDocs > 0 ? (completedDocs / totalDocs) * 100 : 0;
 
-  const handleDownload = (doc: Document) => {
-    const blob = new Blob([doc.content], { type: "text/plain" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${doc.title.replace(/\s+/g, "_")}.txt`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    toast.success(`Downloaded ${doc.title}`);
+  const handleDownload = async (doc: Document) => {
+    try {
+      // Convert content to HTML with embedded images
+      let htmlContent = convertToHTML(doc);
+      
+      // If it's an evidence bundle, fetch and embed images
+      if (doc.type === 'evidence_bundle') {
+        htmlContent = await embedImagesInHTML(doc.content, caseId);
+      }
+      
+      const blob = new Blob([htmlContent], { type: "text/html" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${doc.title.replace(/\s+/g, "_")}.html`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      toast.success(`Downloaded ${doc.title}`);
+    } catch (error) {
+      console.error("Download error:", error);
+      toast.error("Failed to download document");
+    }
+  };
+
+  // Convert plain text content to formatted HTML
+  const convertToHTML = (doc: Document) => {
+    const content = doc.content
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/\n\n/g, '</p><p>')
+      .replace(/\n/g, '<br/>');
+
+    return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${doc.title}</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+      line-height: 1.6;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 40px 20px;
+      color: #1a1a1a;
+      background: #ffffff;
+    }
+    h1 {
+      color: #2563eb;
+      border-bottom: 3px solid #2563eb;
+      padding-bottom: 10px;
+      margin-bottom: 30px;
+    }
+    p {
+      margin: 1em 0;
+    }
+    .evidence-image {
+      max-width: 100%;
+      height: auto;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      margin: 20px 0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .evidence-ref {
+      font-weight: bold;
+      color: #7c3aed;
+      margin-top: 30px;
+      padding: 10px;
+      background: #f3f4f6;
+      border-left: 4px solid #7c3aed;
+    }
+    @media print {
+      body { padding: 20px; }
+      .evidence-image { page-break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+  <h1>${doc.title}</h1>
+  <p>${content}</p>
+  <footer style="margin-top: 60px; padding-top: 20px; border-top: 2px solid #e5e7eb; color: #6b7280; font-size: 0.875rem;">
+    <p>Generated: ${new Date(doc.createdAt).toLocaleDateString('en-GB', { 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    })}</p>
+    <p>DisputeHub - Legal Document Generation</p>
+  </footer>
+</body>
+</html>`;
+  };
+
+  // Embed images for evidence bundles
+  const embedImagesInHTML = async (content: string, caseId: string) => {
+    try {
+      // Fetch evidence items to get image URLs
+      const response = await fetch(`/api/disputes/${caseId}/evidence`);
+      if (!response.ok) return convertToHTML({ ...documents[0], content });
+      
+      const { evidence } = await response.json();
+      const images = evidence.filter((e: any) => e.fileType?.startsWith('image/'));
+      
+      if (images.length === 0) return convertToHTML({ ...documents[0], content });
+      
+      // Replace [IMAGE REFERENCE: url] with actual embedded images
+      let htmlContent = content;
+      
+      for (let i = 0; i < images.length; i++) {
+        const img = images[i];
+        const imageHTML = `
+        <div class="evidence-ref">
+          <strong>EXHIBIT E${evidence.indexOf(img) + 1}: ${img.fileName}</strong>
+        </div>
+        <img src="${img.fileUrl}" alt="${img.fileName}" class="evidence-image" />
+        <p style="font-size: 0.875rem; color: #6b7280; font-style: italic;">
+          ${img.description || 'Evidence photograph'}
+        </p>`;
+        
+        // Replace the reference marker with the actual image
+        const marker = `[IMAGE REFERENCE: ${img.fileUrl}]`;
+        htmlContent = htmlContent.replace(marker, imageHTML);
+      }
+      
+      return convertToHTML({ 
+        id: documents[0].id,
+        type: 'evidence_bundle',
+        title: 'Evidence Bundle',
+        content: htmlContent,
+        status: 'COMPLETED',
+        createdAt: documents[0].createdAt
+      });
+      
+    } catch (error) {
+      console.error("Failed to embed images:", error);
+      return convertToHTML({ ...documents[0], content });
+    }
   };
 
   const handleRetry = async (docId: string) => {

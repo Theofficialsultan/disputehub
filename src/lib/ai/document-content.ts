@@ -170,6 +170,40 @@ Then provide an overall Evidence Summary showing how all evidence works together
 
 400-600 words.`,
 
+    evidence_bundle: `${baseInfo}
+
+Generate a comprehensive EVIDENCE BUNDLE & INDEX document. This should be a formal legal evidence bundle including:
+
+PART 1 - INDEX OF EVIDENCE:
+- List each piece of evidence with reference number (E1, E2, etc.)
+- Include file names and descriptions
+- Note which evidence items are images/photographs
+- Cross-reference to relevant facts
+
+PART 2 - EVIDENCE DESCRIPTIONS:
+For each piece of evidence, provide:
+- Full description of what it shows/contains
+- Date and source (if known from description)
+- Relevance to specific allegations
+- How it supports the case
+
+PART 3 - PHOTOGRAPHIC EVIDENCE:
+${evidence.filter(e => e.fileType?.startsWith('image/')).length > 0 ? `
+The bundle includes ${evidence.filter(e => e.fileType?.startsWith('image/')).length} photograph(s):
+${evidence.filter(e => e.fileType?.startsWith('image/')).map((e, i) => `
+Image ${i + 1}: ${e.fileName}
+Reference: E${evidence.indexOf(e) + 1}
+Description: ${e.description || 'Photographic evidence'}
+URL: ${e.fileUrl}
+`).join('\n')}
+
+Each photograph should be reviewed in conjunction with the written evidence and facts of the case.
+` : 'No photographic evidence has been uploaded yet.'}
+
+Format this as a proper court-ready evidence bundle with clear section headings and professional formatting.
+
+600-1000 words.`,
+
     breach_analysis: `${baseInfo}
 
 Generate a CONTRACT BREACH ANALYSIS. Include:
@@ -302,6 +336,74 @@ You have 14 days from the date of this letter to respond and resolve this matter
 
 Yours faithfully,
 [Your signature]`,
+
+    evidence_bundle: (p) => {
+      const images = p.evidence.filter(e => e.fileType?.startsWith('image/'));
+      const otherEvidence = p.evidence.filter(e => !e.fileType?.startsWith('image/'));
+      
+      return `EVIDENCE BUNDLE & INDEX
+
+${p.caseTitle}
+Date: ${today}
+
+═══════════════════════════════════════════════════════════════
+
+PART 1: INDEX OF EVIDENCE
+
+${p.evidence.map((e, i) => `
+E${i + 1}. ${e.fileName}
+    Type: ${e.fileType?.startsWith('image/') ? 'Photograph/Image' : 'Document'}
+    Description: ${e.description || 'Evidence item'}
+    Date uploaded: ${new Date(e.createdAt).toLocaleDateString('en-GB')}
+`).join('\n')}
+
+═══════════════════════════════════════════════════════════════
+
+PART 2: PHOTOGRAPHIC EVIDENCE
+
+${images.length > 0 ? images.map((e, i) => `
+EXHIBIT E${p.evidence.indexOf(e) + 1}: ${e.fileName}
+
+Description: ${e.description || 'Photographic evidence supporting the claim'}
+File Type: ${e.fileType}
+Date: ${new Date(e.createdAt).toLocaleDateString('en-GB')}
+
+[IMAGE REFERENCE: ${e.fileUrl}]
+This photograph should be viewed as part of the evidence bundle and corroborates the facts as stated in the case summary.
+
+Relevance to Case:
+${e.description || 'This image provides visual evidence supporting the claimant\'s allegations.'}
+
+───────────────────────────────────────────────────────────────
+`).join('\n') : 'No photographic evidence has been uploaded.\n\nNote: If you have photographs, screenshots, or other images relevant to this case, you should upload them as evidence.'}
+
+═══════════════════════════════════════════════════════════════
+
+PART 3: OTHER DOCUMENTARY EVIDENCE
+
+${otherEvidence.length > 0 ? otherEvidence.map((e, i) => `
+EXHIBIT E${p.evidence.indexOf(e) + 1}: ${e.fileName}
+
+Type: ${e.fileType || 'Document'}
+Description: ${e.description || 'Supporting documentation'}
+Date: ${new Date(e.createdAt).toLocaleDateString('en-GB')}
+
+───────────────────────────────────────────────────────────────
+`).join('\n') : 'No additional documentary evidence on file.'}
+
+═══════════════════════════════════════════════════════════════
+
+DECLARATION
+
+I confirm that the evidence listed in this bundle is true and accurate to the best of my knowledge and belief.
+
+The photographic evidence included shows genuine images that have not been altered or manipulated.
+
+All evidence is provided in support of the case: ${p.caseTitle}
+
+Date: ${today}
+Signature: _______________________`;
+    },
   };
 
   const generator = templates[documentType] || templates.case_summary;
