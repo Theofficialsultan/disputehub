@@ -1,8 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { FileText, CheckCircle, Clock, AlertCircle, Download } from "lucide-react";
+import { FileText, CheckCircle, Clock, AlertCircle, Download, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
+import { toast } from "sonner";
 
 interface Document {
   id: string;
@@ -11,6 +13,15 @@ interface Document {
   content: string;
   status: "PENDING" | "GENERATING" | "COMPLETED" | "FAILED";
   createdAt: string;
+  retryCount?: number;
+  lastError?: string | null;
+}
+
+interface DocumentPlan {
+  id: string;
+  complexity: string;
+  complexityScore: number;
+  documentType: string;
 }
 
 interface DocumentStatusProps {
@@ -19,7 +30,9 @@ interface DocumentStatusProps {
 
 export function DocumentStatus({ caseId }: DocumentStatusProps) {
   const [documents, setDocuments] = useState<Document[]>([]);
+  const [plan, setPlan] = useState<DocumentPlan | null>(null);
   const [loading, setLoading] = useState(true);
+  const [retrying, setRetrying] = useState<string | null>(null);
 
   // Load documents
   const loadDocuments = async () => {
@@ -28,6 +41,7 @@ export function DocumentStatus({ caseId }: DocumentStatusProps) {
       if (response.ok) {
         const data = await response.json();
         setDocuments(data.documents || []);
+        setPlan(data.plan || null);
       }
     } catch (error) {
       console.error("Failed to load documents:", error);
@@ -41,14 +55,21 @@ export function DocumentStatus({ caseId }: DocumentStatusProps) {
     loadDocuments();
   }, [caseId]);
 
-  // Poll for updates continuously
+  // Auto-poll for updates
   useEffect(() => {
     const interval = setInterval(() => {
       loadDocuments();
-    }, 3000); // Check every 3 seconds
+    }, 3000); // Poll every 3 seconds
 
     return () => clearInterval(interval);
   }, [caseId]);
+
+  // Calculate progress
+  const totalDocs = documents.length;
+  const completedDocs = documents.filter(d => d.status === "COMPLETED").length;
+  const failedDocs = documents.filter(d => d.status === "FAILED").length;
+  const generatingDocs = documents.filter(d => d.status === "GENERATING" || d.status === "PENDING").length;
+  const progressPercent = totalDocs > 0 ? (completedDocs / totalDocs) * 100 : 0;
 
   const handleDownload = (doc: Document) => {
     const blob = new Blob([doc.content], { type: "text/plain" });
@@ -60,88 +81,164 @@ export function DocumentStatus({ caseId }: DocumentStatusProps) {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+    toast.success(`Downloaded ${doc.title}`);
+  };
+
+  const handleRetry = async (docId: string) => {
+    setRetrying(docId);
+    toast.loading("Retrying document generation...");
+    
+    try {
+      const response = await fetch(`/api/documents/${docId}/retry`, {
+        method: "POST",
+      });
+
+      if (response.ok) {
+        toast.dismiss();
+        toast.success("Retry started! Document will regenerate shortly.");
+        await loadDocuments();
+      } else {
+        throw new Error("Retry failed");
+      }
+    } catch (error) {
+      toast.dismiss();
+      toast.error("Failed to retry. Please try again.");
+    } finally {
+      setRetrying(null);
+    }
   };
 
   return (
     <div className="rounded-2xl bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700 overflow-hidden">
-      <div className="px-6 py-4 border-b border-slate-700 flex items-center gap-3">
-        <div className="p-2 rounded-xl bg-purple-500/10">
-          <FileText className="h-5 w-5 text-purple-400" />
+      {/* Header */}
+      <div className="px-6 py-4 border-b border-slate-700">
+        <div className="flex items-center gap-3">
+          <div className="p-2 rounded-xl bg-purple-500/10">
+            <FileText className="h-5 w-5 text-purple-400" />
+          </div>
+          <div className="flex-1">
+            <h3 className="text-base font-semibold text-white">Documents</h3>
+            <p className="text-xs text-slate-400 mt-0.5">
+              {loading ? (
+                "Loading..."
+              ) : totalDocs === 0 ? (
+                "Your case documents will appear here"
+              ) : generatingDocs > 0 ? (
+                `Generating ${generatingDocs} of ${totalDocs}...`
+              ) : (
+                `${completedDocs} of ${totalDocs} ready`
+              )}
+            </p>
+          </div>
+          {plan && (
+            <div className="text-right">
+              <div className="text-xs font-medium text-purple-400">
+                {plan.complexity}
+              </div>
+              <div className="text-xs text-slate-500">
+                Score: {plan.complexityScore}/100
+              </div>
+            </div>
+          )}
         </div>
-        <div className="flex-1">
-          <h3 className="text-base font-semibold text-white">Documents</h3>
-          <p className="text-xs text-slate-400 mt-0.5">
-            {documents.length > 0
-              ? `${documents.length} document${documents.length !== 1 ? "s" : ""} ready`
-              : "Your case documents will appear here"}
-          </p>
-        </div>
+
+        {/* Progress Bar */}
+        {totalDocs > 0 && generatingDocs > 0 && (
+          <div className="mt-4">
+            <Progress value={progressPercent} className="h-2" />
+            <p className="text-xs text-slate-400 mt-2">
+              {completedDocs} completed • {generatingDocs} generating • {failedDocs} failed
+            </p>
+          </div>
+        )}
       </div>
 
-      {loading ? (
-        <div className="p-6 text-center">
-          <Clock className="h-8 w-8 text-slate-500 mx-auto mb-2 animate-spin" />
-          <p className="text-sm text-slate-400">Loading...</p>
-        </div>
-      ) : documents.length === 0 ? (
-        <div className="p-6 text-center">
-          <FileText className="h-12 w-12 text-slate-600 mx-auto mb-3 opacity-50" />
-          <p className="text-sm font-medium text-slate-300 mb-1">No Documents Yet</p>
-          <p className="text-xs text-slate-500">
-            Continue chatting with the AI to build your case strategy
-          </p>
-        </div>
-      ) : (
-        <div className="p-4 space-y-2">
-          {documents.map((doc) => (
-            <div
-              key={doc.id}
-              className="flex items-center gap-3 p-3 rounded-xl bg-slate-800/50 border border-slate-700/50 hover:border-slate-600 transition-colors"
-            >
-              {/* Status Icon */}
-              <div className="flex-shrink-0">
-                {doc.status === "COMPLETED" && (
-                  <CheckCircle className="h-5 w-5 text-emerald-400" />
-                )}
-                {doc.status === "GENERATING" && (
-                  <Clock className="h-5 w-5 text-blue-400 animate-spin" />
-                )}
-                {doc.status === "PENDING" && (
-                  <Clock className="h-5 w-5 text-slate-400" />
-                )}
-                {doc.status === "FAILED" && (
-                  <AlertCircle className="h-5 w-5 text-red-400" />
-                )}
-              </div>
+      {/* Content */}
+      <div className="p-4">
+        {loading ? (
+          <div className="text-center py-8">
+            <Clock className="h-8 w-8 text-slate-500 mx-auto mb-2 animate-spin" />
+            <p className="text-sm text-slate-400">Loading documents...</p>
+          </div>
+        ) : documents.length === 0 ? (
+          <div className="text-center py-8">
+            <FileText className="h-12 w-12 text-slate-600 mx-auto mb-3 opacity-50" />
+            <p className="text-sm font-medium text-slate-300 mb-1">No Documents Yet</p>
+            <p className="text-xs text-slate-500">
+              Continue chatting with the AI to build your case
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {documents.map((doc) => (
+              <div
+                key={doc.id}
+                className="flex items-center gap-3 p-3 rounded-xl bg-slate-800/50 border border-slate-700/50 hover:border-slate-600 transition-colors"
+              >
+                {/* Status Icon */}
+                <div className="flex-shrink-0">
+                  {doc.status === "COMPLETED" && (
+                    <CheckCircle className="h-5 w-5 text-emerald-400" />
+                  )}
+                  {(doc.status === "GENERATING" || doc.status === "PENDING") && (
+                    <Clock className="h-5 w-5 text-blue-400 animate-spin" />
+                  )}
+                  {doc.status === "FAILED" && (
+                    <AlertCircle className="h-5 w-5 text-red-400" />
+                  )}
+                </div>
 
-              {/* Document Info */}
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-white truncate">
-                  {doc.title}
-                </p>
-                <p className="text-xs text-slate-400">
-                  {doc.status === "COMPLETED" && "Ready to download"}
-                  {doc.status === "GENERATING" && "Generating..."}
-                  {doc.status === "PENDING" && "Waiting..."}
-                  {doc.status === "FAILED" && "Generation failed"}
-                </p>
-              </div>
+                {/* Document Info */}
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-white truncate">
+                    {doc.title}
+                  </p>
+                  <p className="text-xs text-slate-400">
+                    {doc.status === "COMPLETED" && `${doc.content.length} characters • Ready`}
+                    {doc.status === "GENERATING" && "Generating content..."}
+                    {doc.status === "PENDING" && "Waiting to generate..."}
+                    {doc.status === "FAILED" && (
+                      <>
+                        Failed{doc.retryCount ? ` (${doc.retryCount} retries)` : ""}
+                        {doc.lastError && (
+                          <span className="block text-xs text-red-400 mt-1 truncate">
+                            {doc.lastError}
+                          </span>
+                        )}
+                      </>
+                    )}
+                  </p>
+                </div>
 
-              {/* Download Button */}
-              {doc.status === "COMPLETED" && (
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={() => handleDownload(doc)}
-                  className="flex-shrink-0 text-purple-400 hover:text-purple-300 hover:bg-purple-500/10"
-                >
-                  <Download className="h-4 w-4" />
-                </Button>
-              )}
-            </div>
-          ))}
-        </div>
-      )}
+                {/* Actions */}
+                <div className="flex-shrink-0 flex gap-2">
+                  {doc.status === "COMPLETED" && (
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => handleDownload(doc)}
+                      className="text-purple-400 hover:text-purple-300 hover:bg-purple-500/10"
+                    >
+                      <Download className="h-4 w-4" />
+                    </Button>
+                  )}
+                  {doc.status === "FAILED" && (
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => handleRetry(doc.id)}
+                      disabled={retrying === doc.id}
+                      className="text-orange-400 hover:text-orange-300 hover:bg-orange-500/10"
+                    >
+                      <RefreshCw className={`h-4 w-4 ${retrying === doc.id ? "animate-spin" : ""}`} />
+                    </Button>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

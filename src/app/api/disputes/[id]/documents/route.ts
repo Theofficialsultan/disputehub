@@ -1,7 +1,7 @@
 /**
  * GET /api/disputes/[id]/documents
  * 
- * Fetches all generated documents for a case.
+ * Fetches all generated documents for a case through DocumentPlan relationship.
  */
 
 import { NextResponse } from "next/server";
@@ -29,15 +29,43 @@ export async function GET(
       return NextResponse.json({ error: "Case not found" }, { status: 404 });
     }
 
-    // Get all documents for this case
-    const documents = await prisma.generatedDocument.findMany({
+    // Get document plan with all documents (proper schema relationship)
+    const documentPlan = await prisma.documentPlan.findUnique({
       where: { caseId },
+      include: {
+        documents: {
+          orderBy: [
+            { order: "asc" },
+            { createdAt: "desc" }
+          ],
+        },
+      },
+    });
+
+    // Also get any documents created directly with caseId (backward compatibility)
+    const directDocuments = await prisma.generatedDocument.findMany({
+      where: { 
+        caseId,
+        planId: null, // Only get documents not linked to a plan
+      },
       orderBy: { createdAt: "desc" },
     });
 
+    const allDocuments = [
+      ...(documentPlan?.documents || []),
+      ...directDocuments,
+    ];
+
     return NextResponse.json({
       success: true,
-      documents,
+      plan: documentPlan ? {
+        id: documentPlan.id,
+        complexity: documentPlan.complexity,
+        complexityScore: documentPlan.complexityScore,
+        documentType: documentPlan.documentType,
+      } : null,
+      documents: allDocuments,
+      totalDocuments: allDocuments.length,
     });
 
   } catch (error) {
