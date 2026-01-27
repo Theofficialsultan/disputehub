@@ -7,7 +7,7 @@ import type { CaseStrategy } from "@prisma/client";
 
 // Use Prisma enum values
 export type ComplexityLevel = "SIMPLE" | "COMPLEX";
-export type DocumentStructureType = "BASIC" | "INTERMEDIATE" | "COMPREHENSIVE";
+export type DocumentStructureType = "SINGLE_LETTER" | "MULTI_DOCUMENT_DOCKET";
 
 interface ComplexityScore {
   level: ComplexityLevel;
@@ -81,19 +81,16 @@ export function calculateComplexity(
   }
   score += breakdown.outcomeComplexity;
 
-  // Determine complexity level (using Prisma enum: SIMPLE or COMPLEX)
+  // Determine complexity level (using Prisma enums)
   let level: ComplexityLevel;
   let documentStructure: DocumentStructureType;
 
-  if (score >= 60) {
+  if (score >= 40) {
     level = "COMPLEX";
-    documentStructure = "COMPREHENSIVE";
-  } else if (score >= 40) {
-    level = "COMPLEX";
-    documentStructure = "INTERMEDIATE";
+    documentStructure = "MULTI_DOCUMENT_DOCKET";
   } else {
     level = "SIMPLE";
-    documentStructure = "BASIC";
+    documentStructure = "SINGLE_LETTER";
   }
 
   // Recommend documents based on complexity and dispute type
