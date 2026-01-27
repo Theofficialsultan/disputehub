@@ -38,7 +38,6 @@ export async function GET(
     return NextResponse.json({
       success: true,
       documents,
-      isLocked: dispute.strategyLocked,
     });
 
   } catch (error) {

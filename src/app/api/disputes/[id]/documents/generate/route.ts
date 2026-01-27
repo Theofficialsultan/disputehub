@@ -32,17 +32,15 @@ export async function POST(
       return NextResponse.json({ error: "Case not found" }, { status: 404 });
     }
 
-    // 2. Check if already locked (documents already generated)
-    if (dispute.strategyLocked) {
-      console.log(`[Generate Docs] Case already locked, returning existing docs`);
-      const existingDocs = await prisma.generatedDocument.findMany({
+    // 2. Check if documents already exist - delete them to regenerate
+    const existingDocs = await prisma.generatedDocument.findMany({
+      where: { caseId },
+    });
+    
+    if (existingDocs.length > 0) {
+      console.log(`[Generate Docs] Deleting ${existingDocs.length} existing documents to regenerate`);
+      await prisma.generatedDocument.deleteMany({
         where: { caseId },
-        orderBy: { createdAt: "desc" },
-      });
-      return NextResponse.json({
-        success: true,
-        message: "Documents already generated",
-        documents: existingDocs,
       });
     }
 
@@ -127,12 +125,6 @@ export async function POST(
         });
       }
     }
-
-    // 7. Lock the case strategy (documents generated)
-    await prisma.dispute.update({
-      where: { id: caseId },
-      data: { strategyLocked: true },
-    });
 
     console.log(`[Generate Docs] ✅ All done! Generated ${generatedDocs.length}/${documentTypes.length} documents`);
 

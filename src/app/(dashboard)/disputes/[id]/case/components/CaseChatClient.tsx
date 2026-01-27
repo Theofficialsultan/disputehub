@@ -367,10 +367,7 @@ export function CaseChatClient({ dispute }: CaseChatClientProps) {
           <div className="flex-1 overflow-y-auto px-6 py-8">
             <div className="space-y-6">
               {/* Document Status */}
-              <DocumentStatus
-                caseId={dispute.id}
-                isLocked={dispute.strategyLocked}
-              />
+              <DocumentStatus caseId={dispute.id} />
 
               {/* Strategy Summary (Compact) */}
               <StrategySummaryPanel

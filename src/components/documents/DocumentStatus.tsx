@@ -15,10 +15,9 @@ interface Document {
 
 interface DocumentStatusProps {
   caseId: string;
-  isLocked: boolean;
 }
 
-export function DocumentStatus({ caseId, isLocked }: DocumentStatusProps) {
+export function DocumentStatus({ caseId }: DocumentStatusProps) {
   const [documents, setDocuments] = useState<Document[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -42,16 +41,14 @@ export function DocumentStatus({ caseId, isLocked }: DocumentStatusProps) {
     loadDocuments();
   }, [caseId]);
 
-  // Poll for updates when locked (generating)
+  // Poll for updates continuously
   useEffect(() => {
-    if (!isLocked) return;
-
     const interval = setInterval(() => {
       loadDocuments();
     }, 3000); // Check every 3 seconds
 
     return () => clearInterval(interval);
-  }, [isLocked, caseId]);
+  }, [caseId]);
 
   const handleDownload = (doc: Document) => {
     const blob = new Blob([doc.content], { type: "text/plain" });
@@ -74,7 +71,7 @@ export function DocumentStatus({ caseId, isLocked }: DocumentStatusProps) {
         <div className="flex-1">
           <h3 className="text-base font-semibold text-white">Documents</h3>
           <p className="text-xs text-slate-400 mt-0.5">
-            {isLocked
+            {documents.length > 0
               ? `${documents.length} document${documents.length !== 1 ? "s" : ""} ready`
               : "Your case documents will appear here"}
           </p>
