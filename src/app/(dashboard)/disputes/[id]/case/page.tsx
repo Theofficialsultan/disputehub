@@ -28,6 +28,9 @@ export default async function CaseChatPage({
       restricted: true,
       lifecycleStatus: true,
       strategyLocked: true, // Phase 8.2.5
+      phase: true, // Phase 8.5-8.7
+      chatLocked: true, // Phase 8.5-8.7
+      lockReason: true, // Phase 8.5-8.7
     },
   });
 

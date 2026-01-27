@@ -23,6 +23,12 @@ interface DocumentPlan {
   complexity: string;
   complexityScore: number;
   documentType: string;
+  routingStatus?: string;
+  routingConfidence?: number;
+  jurisdiction?: string;
+  forum?: string;
+  blockType?: string | null;
+  nextAction?: string | null;
 }
 
 interface DocumentStatusProps {
@@ -241,6 +247,16 @@ export function DocumentStatus({ caseId }: DocumentStatusProps) {
     }
   };
 
+  // Phase 8.5-8.7: Routing status indicators
+  const routingStatusColors = {
+    PENDING: "text-yellow-400 bg-yellow-500/10 border-yellow-500/30",
+    APPROVED: "text-emerald-400 bg-emerald-500/10 border-emerald-500/30",
+    BLOCKED: "text-red-400 bg-red-500/10 border-red-500/30",
+    REQUIRES_CLARIFICATION: "text-orange-400 bg-orange-500/10 border-orange-500/30",
+  };
+
+  const isBlocked = plan?.routingStatus === "BLOCKED";
+
   return (
     <div className="rounded-2xl bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700 overflow-hidden">
       {/* Header */}
@@ -282,6 +298,48 @@ export function DocumentStatus({ caseId }: DocumentStatusProps) {
             )}
           </div>
         </div>
+
+        {/* Phase 8.5-8.7: Routing Status */}
+        {plan?.routingStatus && (
+          <div className="mt-4">
+            <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-medium ${routingStatusColors[plan.routingStatus as keyof typeof routingStatusColors] || "text-slate-400 bg-slate-500/10 border-slate-500/30"}`}>
+              <span className="font-semibold">Route:</span>
+              {plan.routingStatus}
+              {plan.routingConfidence && ` (${Math.round(plan.routingConfidence * 100)}%)`}
+            </div>
+            {plan.jurisdiction && plan.forum && (
+              <p className="text-xs text-slate-400 mt-2">
+                {plan.jurisdiction} → {plan.forum}
+              </p>
+            )}
+          </div>
+        )}
+
+        {/* Phase 8.5-8.7: BLOCKED State Warning */}
+        {isBlocked && (
+          <div className="mt-4 p-4 rounded-xl bg-red-500/10 border border-red-500/30">
+            <div className="flex items-start gap-3">
+              <AlertCircle className="h-5 w-5 text-red-400 flex-shrink-0 mt-0.5" />
+              <div className="flex-1">
+                <h4 className="text-sm font-semibold text-red-300 mb-1">
+                  Document Generation Blocked
+                </h4>
+                <p className="text-xs text-red-200/80 mb-2">
+                  {plan.blockType === "MISSING_PREREQUISITE" && "Missing required prerequisites"}
+                  {plan.blockType === "TIME_LIMIT_EXPIRED" && "Time limit has expired"}
+                  {plan.blockType === "INSUFFICIENT_INFORMATION" && "More information needed"}
+                  {plan.blockType === "INVALID_ROUTE" && "Invalid legal route"}
+                  {!plan.blockType && "Unable to proceed with document generation"}
+                </p>
+                {plan.nextAction && (
+                  <p className="text-xs text-red-300 font-medium">
+                    Next Step: {plan.nextAction}
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Progress Bar */}
         {totalDocs > 0 && generatingDocs > 0 && (

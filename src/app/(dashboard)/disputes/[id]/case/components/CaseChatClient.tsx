@@ -20,6 +20,9 @@ type DisputeData = {
   conversationStatus: ConversationStatus | null;
   lifecycleStatus: any; // CaseLifecycleStatus
   strategyLocked: boolean; // Phase 8.2.5
+  phase?: string; // Phase 8.5-8.7: GATHERING, ROUTING, GENERATING, COMPLETED, BLOCKED
+  chatLocked?: boolean; // Phase 8.5-8.7: One-way control flow
+  lockReason?: string | null; // Phase 8.5-8.7: Why chat is locked
 };
 
 type CaseChatClientProps = {
@@ -122,6 +125,13 @@ export function CaseChatClient({ dispute }: CaseChatClientProps) {
     }
   };
 
+  // Helper to trigger document status refresh (called after messages)
+  const loadDocuments = () => {
+    // This triggers a re-render of DocumentStatus component which has its own polling
+    // We just need to ensure the component knows to check for updates
+    // The DocumentStatus component handles its own data fetching
+  };
+
 
   const handleSend = async () => {
     if (!input.trim() || isTyping || isRestricted) return;
@@ -168,6 +178,14 @@ export function CaseChatClient({ dispute }: CaseChatClientProps) {
 
       if (!response.ok) {
         const errorData = await response.json();
+        
+        // Phase 8.5-8.7: Handle chat locked state
+        if (response.status === 403 && errorData.phase) {
+          setIsRestricted(true);
+          toast.error(errorData.systemMessage || "Chat is locked");
+          return;
+        }
+        
         throw new Error(errorData.error || "Failed to send message");
       }
 
@@ -319,16 +337,34 @@ export function CaseChatClient({ dispute }: CaseChatClientProps) {
             <p className="text-xs text-slate-400">AI-Assisted Case Building</p>
           </div>
         </div>
-        <Badge 
-          variant="outline" 
-          className={`border-indigo-500/30 ${
-            dispute.conversationStatus === "OPEN" 
-              ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/30" 
-              : "bg-slate-500/20 text-slate-300"
-          }`}
-        >
-          {dispute.conversationStatus || "OPEN"}
-        </Badge>
+        <div className="flex items-center gap-2">
+          {/* Phase 8.5-8.7: Phase Badge */}
+          {dispute.phase && dispute.phase !== "GATHERING" && (
+            <Badge 
+              variant="outline" 
+              className={`border-indigo-500/30 ${
+                dispute.phase === "ROUTING" ? "bg-blue-500/20 text-blue-300 border-blue-500/30" :
+                dispute.phase === "GENERATING" ? "bg-purple-500/20 text-purple-300 border-purple-500/30" :
+                dispute.phase === "COMPLETED" ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/30" :
+                dispute.phase === "BLOCKED" ? "bg-red-500/20 text-red-300 border-red-500/30" :
+                "bg-slate-500/20 text-slate-300"
+              }`}
+            >
+              {dispute.phase}
+            </Badge>
+          )}
+          
+          <Badge 
+            variant="outline" 
+            className={`border-indigo-500/30 ${
+              dispute.conversationStatus === "OPEN" && !dispute.chatLocked
+                ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/30" 
+                : "bg-slate-500/20 text-slate-300"
+            }`}
+          >
+            {dispute.chatLocked ? "LOCKED" : dispute.conversationStatus || "OPEN"}
+          </Badge>
+        </div>
       </div>
 
       {/* Split Layout: Chat Left | Documents + Evidence Right */}
@@ -359,6 +395,7 @@ export function CaseChatClient({ dispute }: CaseChatClientProps) {
             isRestricted={isRestricted}
             strategyLocked={dispute.strategyLocked}
             textareaRef={textareaRef}
+            dispute={dispute}
           />
         </div>
 
@@ -516,6 +553,7 @@ function ChatInput({
   isRestricted,
   strategyLocked,
   textareaRef,
+  dispute,
 }: {
   value: string;
   onChange: (value: string) => void;
@@ -525,7 +563,62 @@ function ChatInput({
   isRestricted: boolean;
   strategyLocked: boolean; // Phase 8.2.5
   textareaRef: React.RefObject<HTMLTextAreaElement>;
+  dispute: DisputeData;
 }) {
+  // Phase 8.5-8.7: Handle chat locked state
+  if (dispute.chatLocked) {
+    const phaseMessages: Record<string, { icon: any; title: string; message: string; color: string }> = {
+      ROUTING: {
+        icon: Clock,
+        title: "Analyzing Legal Route",
+        message: "We're determining the best legal pathway for your case. This will take a moment...",
+        color: "blue"
+      },
+      GENERATING: {
+        icon: FileText,
+        title: "Generating Documents",
+        message: "Your legal documents are being created. Check the Documents section on the right.",
+        color: "purple"
+      },
+      COMPLETED: {
+        icon: CheckCircle,
+        title: "Documents Ready",
+        message: "Your documents are complete! Download them from the Documents section.",
+        color: "emerald"
+      },
+      BLOCKED: {
+        icon: AlertCircle,
+        title: "Action Required",
+        message: dispute.lockReason || "We've identified an issue. Please review the Documents section for details.",
+        color: "red"
+      }
+    };
+
+    const phaseInfo = phaseMessages[dispute.phase || "GENERATING"] || phaseMessages.GENERATING;
+    const Icon = phaseInfo.icon;
+
+    return (
+      <div className={`border-t border-${phaseInfo.color}-500/20 backdrop-blur-xl bg-slate-900/50 px-6 py-6`}>
+        <div className="max-w-3xl mx-auto">
+          <div className={`rounded-3xl p-6 glass-strong border border-${phaseInfo.color}-500/30 text-center`}>
+            <div className={`p-3 rounded-2xl bg-${phaseInfo.color}-500/20 border border-${phaseInfo.color}-500/30 w-14 h-14 mx-auto mb-4 flex items-center justify-center`}>
+              <Icon className={`h-7 w-7 text-${phaseInfo.color}-400`} />
+            </div>
+            <h3 className="text-lg font-bold text-white mb-2">
+              {phaseInfo.title}
+            </h3>
+            <p className="text-sm text-slate-300 mb-3">
+              {phaseInfo.message}
+            </p>
+            <p className="text-xs text-slate-500">
+              The chat will remain locked during this process.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (isRestricted) {
     return (
       <div className="border-t border-red-500/20 backdrop-blur-xl bg-slate-900/50 px-6 py-6">

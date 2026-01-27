@@ -10,17 +10,30 @@ import { extractCaseStrategy, mergeStrategy } from "@/lib/ai/strategy";
 import { z } from "zod";
 
 // Helper: Check if strategy is complete enough for document generation
-function checkIfReadyForDocuments(strategy: any): boolean {
+function checkIfReadyForDocuments(strategy: any, evidenceCount: number): boolean {
   // Must have dispute type
   if (!strategy.disputeType) return false;
   
-  // Must have at least 5 key facts
+  // Must have at least 8 key facts (increased from 5)
   const facts = Array.isArray(strategy.keyFacts) ? strategy.keyFacts : [];
-  if (facts.length < 5) return false;
+  if (facts.length < 8) return false;
   
-  // Must have a desired outcome (at least 20 characters)
+  // Must have a desired outcome (at least 30 characters)
   const outcome = strategy.desiredOutcome || "";
-  if (outcome.length < 20) return false;
+  if (outcome.length < 30) return false;
+  
+  // Must have at least 2 pieces of evidence mentioned
+  const evidenceMentioned = Array.isArray(strategy.evidenceMentioned) 
+    ? strategy.evidenceMentioned 
+    : [];
+  if (evidenceMentioned.length < 2) return false;
+  
+  // Prefer to have at least 1 piece of actual uploaded evidence
+  // But don't hard-block if missing (user may not have evidence)
+  const hasUploadedEvidence = evidenceCount > 0;
+  
+  // Log readiness check for debugging
+  console.log(`[Ready Check] Facts: ${facts.length}/8, Outcome: ${outcome.length}/30 chars, Evidence mentioned: ${evidenceMentioned.length}/2, Uploaded: ${hasUploadedEvidence}`);
   
   return true;
 }
@@ -339,7 +352,7 @@ export async function POST(
 
             // AUTOMATIC DOCUMENT GENERATION
             // If we have enough information, trigger document generation
-            const shouldGenerate = checkIfReadyForDocuments(merged);
+            const shouldGenerate = checkIfReadyForDocuments(merged, evidenceItems.length);
             
             if (shouldGenerate) {
               console.log(`[API] ✅ Strategy complete! Triggering document generation...`);
