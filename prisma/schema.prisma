@@ -61,6 +61,24 @@ enum CaseLifecycleStatus {
   CLOSED
 }
 
+// Phase 8.5 - Legal Intelligence System
+// Case phase for routing and document generation control
+enum CasePhase {
+  GATHERING      // AI gathering facts (System 1)
+  ROUTING        // Jurisdiction classification (System 2)
+  GENERATING     // Document generation (System 3)
+  COMPLETED      // Documents ready
+  BLOCKED        // Cannot proceed
+}
+
+// Routing status for System 2 decisions
+enum RoutingStatus {
+  PENDING                  // Not yet classified
+  APPROVED                 // Ready for document generation
+  BLOCKED                  // Cannot generate (missing prereqs, out of time, etc.)
+  REQUIRES_CLARIFICATION   // Need user input
+}
+
 // Dispute model - minimal and extensible
 model Dispute {
   id          String        @id @default(cuid())
@@ -88,6 +106,12 @@ model Dispute {
 
   // Phase 8.2.5 - System-Owned Decision Gate
   strategyLocked       Boolean              @default(false) // System-only flag, marks strategy as complete and documents ready to generate
+
+  // Phase 8.5 - Legal Intelligence & Control Flow
+  phase                CasePhase            @default(GATHERING)
+  chatLocked           Boolean              @default(false)
+  lockReason           String?
+  lockedAt             DateTime?
 
   // Relations
   userId String
@@ -194,12 +218,12 @@ model CaseStrategy {
 }
 
 // Phase 7.2 Block 3B - Document Plan model
-// Persisted plan for document generation (created explicitly via POST)
+// Phase 8.5 - Enhanced with System 2 routing decision
 model DocumentPlan {
   id              String   @id @default(cuid())
   caseId          String   @unique // One plan per case (idempotent)
   
-  // Classification
+  // Classification (legacy - kept for backward compatibility)
   complexity      CaseComplexity
   complexityScore Int
   
@@ -209,6 +233,45 @@ model DocumentPlan {
   
   // Document structure type
   documentType    DocumentStructureType
+  
+  // Phase 8.5 - System 2 Routing Decision (HARD GATE)
+  routingStatus        RoutingStatus  @default(PENDING)
+  routingConfidence    Float?
+  routingReason        String?        @db.Text
+  
+  // Classification results
+  jurisdiction         String?
+  legalRelationship    String?
+  counterparty         String?
+  domain               String?
+  forum                String?
+  forumReasoning       String?        @db.Text
+  
+  // Document control (official form IDs)
+  allowedDocuments     String[]       // Array of OfficialFormID
+  blockedDocuments     String[]       // Array of OfficialFormID
+  
+  // Prerequisites
+  prerequisitesMet     Boolean        @default(false)
+  prerequisitesList    Json?          // Array of Prerequisite objects
+  
+  // Time limits
+  timeLimitDeadline    DateTime?
+  timeLimitMet         Boolean?
+  timeLimitDescription String?
+  
+  // Alternative routes
+  alternativeRoutes    Json?          // Array of AlternativeRoute objects
+  
+  // Blocked status details
+  blockType            String?
+  nextAction           String?        @db.Text
+  canResolve           Boolean?
+  resolutionSteps      Json?          // Array of strings
+  
+  // Timestamps
+  routingCompletedAt   DateTime?
+  generationStartedAt  DateTime?
   
   // Metadata
   createdAt       DateTime @default(now())
@@ -220,6 +283,8 @@ model DocumentPlan {
   
   @@index([caseId])
   @@index([complexity])
+  @@index([routingStatus])
+  @@index([forum])
 }
 
 // Phase 7.2 Block 3B - Generated Document model
@@ -246,6 +311,11 @@ model GeneratedDocument {
   
   // Phase 8.2.3: Follow-up tracking
   isFollowUp   Boolean       @default(false)
+  
+  // Phase 8.5: Strong validation
+  validationErrors   Json?    // Array of validation error strings
+  validationWarnings Json?    // Array of validation warning strings
+  validatedAt        DateTime?
   
   // Legacy field (deprecated - not used in Block 3C)
   content      String?       @db.Text
