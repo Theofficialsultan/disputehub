@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, memo } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Send, ArrowLeft, AlertCircle, CheckCircle, Loader2 } from "lucide-react";
+import { Send, ArrowLeft, AlertCircle, CheckCircle, Loader2, Clock, FileText } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import type { Message, CaseStrategy } from "@/types/chat";
 import type { CaseMode, ConversationStatus } from "@prisma/client";
