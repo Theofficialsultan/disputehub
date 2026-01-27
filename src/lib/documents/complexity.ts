@@ -5,7 +5,8 @@
 
 import type { CaseStrategy } from "@prisma/client";
 
-export type ComplexityLevel = "LOW" | "MEDIUM" | "HIGH";
+// Use Prisma enum values
+export type ComplexityLevel = "SIMPLE" | "COMPLEX";
 export type DocumentStructureType = "BASIC" | "INTERMEDIATE" | "COMPREHENSIVE";
 
 interface ComplexityScore {
@@ -80,18 +81,18 @@ export function calculateComplexity(
   }
   score += breakdown.outcomeComplexity;
 
-  // Determine complexity level
+  // Determine complexity level (using Prisma enum: SIMPLE or COMPLEX)
   let level: ComplexityLevel;
   let documentStructure: DocumentStructureType;
 
-  if (score >= 70) {
-    level = "HIGH";
+  if (score >= 60) {
+    level = "COMPLEX";
     documentStructure = "COMPREHENSIVE";
   } else if (score >= 40) {
-    level = "MEDIUM";
+    level = "COMPLEX";
     documentStructure = "INTERMEDIATE";
   } else {
-    level = "LOW";
+    level = "SIMPLE";
     documentStructure = "BASIC";
   }
 
@@ -127,16 +128,11 @@ function getRecommendedDocuments(
 
   const specific = typeSpecific[disputeType.toLowerCase()] || ["evidence_bundle"];
   
-  // For high complexity, include all documents
-  if (complexity === "HIGH") {
-    return [...baseDocuments, ...specific, "witness_statement", "chronology"];
+  // For complex cases, include more documents
+  if (complexity === "COMPLEX") {
+    return [...baseDocuments, ...specific];
   }
   
-  // For medium, include some extras
-  if (complexity === "MEDIUM") {
-    return [...baseDocuments, ...specific.slice(0, 2)];
-  }
-  
-  // For low, just basics + one specific
+  // For simple cases, just basics + one specific
   return [...baseDocuments, specific[0]];
 }
