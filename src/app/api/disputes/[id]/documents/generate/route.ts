@@ -1,18 +1,25 @@
 /**
  * POST /api/disputes/[id]/documents/generate
  * 
- * Production-ready document generation with:
- * - DocumentPlan creation with complexity scoring
- * - Proper error handling and retry logic
- * - Timeline event creation for audit trail
- * - Batch generation with progress tracking
+ * Phase 8.5-8.7: Legal Intelligence System
+ * 
+ * HARD-GATED DOCUMENT GENERATION
+ * - System 2 routing decision MUST exist and be APPROVED
+ * - Only generates documents in allowedDocs list
+ * - Enforces prerequisites and time limits
+ * - Strong validation before saving
+ * - One-way control flow (chat locks after generation starts)
  */
 
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUserId } from "@/lib/auth";
 import { generateAIContent } from "@/lib/ai/document-content";
-import { calculateComplexity } from "@/lib/documents/complexity";
+import { executeRoutingEngine } from "@/lib/legal/routing-engine";
+import { validateRoutingDecision, validateDocumentGeneration } from "@/lib/legal/gate-validator";
+import { validateGeneratedDocument, getValidationDetails } from "@/lib/legal/document-validator";
+import { getFormMetadata, type OfficialFormID } from "@/lib/legal/form-registry";
+import type { ClassificationInput } from "@/lib/legal/routing-types";
 
 export async function POST(
   request: Request,
@@ -27,9 +34,12 @@ export async function POST(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    console.log(`[Generate Docs] Starting for case ${caseId}`);
+    console.log(`[System 3] Document generation requested for case ${caseId}`);
 
-    // 1. Verify case ownership
+    // ========================================================================
+    // STEP 1: Verify case ownership and get data
+    // ========================================================================
+
     const dispute = await prisma.dispute.findFirst({
       where: { id: caseId, userId },
     });
@@ -38,7 +48,11 @@ export async function POST(
       return NextResponse.json({ error: "Case not found" }, { status: 404 });
     }
 
-    // 2. Get strategy and evidence
+    // Check if chat is locked
+    if (dispute.chatLocked && dispute.phase !== "GATHERING") {
+      console.log(`[System 3] Case already in phase: ${dispute.phase}`);
+    }
+
     const strategy = await prisma.caseStrategy.findFirst({
       where: { caseId },
     });
@@ -55,220 +69,402 @@ export async function POST(
       orderBy: { evidenceIndex: "asc" },
     });
 
-    console.log(`[Generate Docs] Strategy: ${strategy.keyFacts?.length || 0} facts, Evidence: ${evidence.length} items`);
+    console.log(`[System 3] Data: ${strategy.keyFacts?.length || 0} facts, ${evidence.length} evidence items`);
 
-    // 3. Calculate complexity score
-    const complexityAnalysis = calculateComplexity(strategy, evidence.length);
-    console.log(`[Generate Docs] Complexity: ${complexityAnalysis.level} (${complexityAnalysis.score}/100)`);
+    // ========================================================================
+    // STEP 2: Get or create DocumentPlan with routing decision
+    // ========================================================================
 
-    // 4. Create or update DocumentPlan
-    const documentPlan = await prisma.documentPlan.upsert({
-      where: { caseId },
-      create: {
-        caseId,
-        complexity: complexityAnalysis.level,
-        complexityScore: complexityAnalysis.score,
-        complexityBreakdown: complexityAnalysis.breakdown as any,
-        documentType: complexityAnalysis.documentStructure,
-      },
-      update: {
-        complexity: complexityAnalysis.level,
-        complexityScore: complexityAnalysis.score,
-        complexityBreakdown: complexityAnalysis.breakdown as any,
-        documentType: complexityAnalysis.documentStructure,
-      },
+    let documentPlan = await prisma.documentPlan.findUnique({
+      where: { caseId }
     });
 
-    console.log(`[Generate Docs] DocumentPlan created/updated: ${documentPlan.id}`);
+    // If no plan exists OR routing not done, run System 2
+    if (!documentPlan || documentPlan.routingStatus === "PENDING") {
+      console.log(`[System 3] No routing decision found. Executing System 2...`);
 
-    // 5. Delete old documents to regenerate
+      // Transition to ROUTING phase
+      await prisma.dispute.update({
+        where: { id: caseId },
+        data: {
+          phase: "ROUTING",
+          chatLocked: true,
+          lockReason: "Analyzing legal route...",
+          lockedAt: new Date()
+        }
+      });
+
+      // Execute System 2
+      const classificationInput: ClassificationInput = {
+        caseId,
+        caseTitle: dispute.title,
+        keyFacts: Array.isArray(strategy.keyFacts) ? strategy.keyFacts as string[] : [],
+        disputeType: strategy.disputeType,
+        desiredOutcome: strategy.desiredOutcome || "",
+        evidenceCount: evidence.length,
+        evidenceTypes: evidence.map(e => e.fileType || "unknown")
+      };
+
+      const routingResponse = await executeRoutingEngine(classificationInput);
+
+      if (!routingResponse.success) {
+        // Routing failed
+        await prisma.dispute.update({
+          where: { id: caseId },
+          data: {
+            phase: "BLOCKED",
+            lockReason: routingResponse.error || "Routing failed"
+          }
+        });
+
+        return NextResponse.json({
+          error: "Routing failed",
+          details: routingResponse.error,
+          requiresClarification: routingResponse.requiresClarification
+        }, { status: 400 });
+      }
+
+      const decision = routingResponse.decision!;
+
+      // Save routing decision to DocumentPlan
+      documentPlan = await prisma.documentPlan.upsert({
+        where: { caseId },
+        create: {
+          caseId,
+          // Legacy fields (for backward compatibility)
+          complexity: decision.confidence >= 0.90 ? "COMPLEX" : "SIMPLE",
+          complexityScore: Math.round(decision.confidence * 100),
+          complexityBreakdown: {},
+          documentType: "MULTI_DOCUMENT_DOCKET",
+          // System 2 routing decision
+          routingStatus: decision.status,
+          routingConfidence: decision.confidence,
+          routingReason: decision.reason,
+          jurisdiction: decision.jurisdiction,
+          legalRelationship: decision.relationship,
+          counterparty: decision.counterparty,
+          domain: decision.domain,
+          forum: decision.forum,
+          forumReasoning: decision.forumReasoning,
+          allowedDocuments: decision.allowedDocs,
+          blockedDocuments: decision.blockedDocs,
+          prerequisitesMet: decision.prerequisitesMet,
+          prerequisitesList: decision.prerequisites as any,
+          timeLimitDeadline: decision.timeLimit?.deadline,
+          timeLimitMet: decision.timeLimit?.met,
+          timeLimitDescription: decision.timeLimit?.description,
+          alternativeRoutes: decision.alternativeRoutes as any,
+          routingCompletedAt: new Date()
+        },
+        update: {
+          routingStatus: decision.status,
+          routingConfidence: decision.confidence,
+          routingReason: decision.reason,
+          jurisdiction: decision.jurisdiction,
+          legalRelationship: decision.relationship,
+          counterparty: decision.counterparty,
+          domain: decision.domain,
+          forum: decision.forum,
+          forumReasoning: decision.forumReasoning,
+          allowedDocuments: decision.allowedDocs,
+          blockedDocuments: decision.blockedDocs,
+          prerequisitesMet: decision.prerequisitesMet,
+          prerequisitesList: decision.prerequisites as any,
+          timeLimitDeadline: decision.timeLimit?.deadline,
+          timeLimitMet: decision.timeLimit?.met,
+          timeLimitDescription: decision.timeLimit?.description,
+          alternativeRoutes: decision.alternativeRoutes as any,
+          routingCompletedAt: new Date()
+        }
+      });
+
+      console.log(`[System 3] Routing decision saved: ${decision.status}`);
+    }
+
+    // ========================================================================
+    // STEP 3: HARD GATE VALIDATION
+    // ========================================================================
+
+    // Reconstruct routing decision from database
+    const routingDecision = documentPlan.routingStatus ? {
+      status: documentPlan.routingStatus as any,
+      confidence: documentPlan.routingConfidence || 0,
+      jurisdiction: documentPlan.jurisdiction as any,
+      relationship: documentPlan.legalRelationship as any,
+      counterparty: documentPlan.counterparty as any,
+      domain: documentPlan.domain as any,
+      forum: documentPlan.forum as any,
+      forumReasoning: documentPlan.forumReasoning || "",
+      allowedDocs: documentPlan.allowedDocuments as OfficialFormID[],
+      blockedDocs: documentPlan.blockedDocuments as OfficialFormID[],
+      prerequisites: documentPlan.prerequisitesList as any || [],
+      prerequisitesMet: documentPlan.prerequisitesMet,
+      timeLimit: documentPlan.timeLimitDeadline ? {
+        deadline: documentPlan.timeLimitDeadline,
+        daysRemaining: Math.ceil((documentPlan.timeLimitDeadline.getTime() - Date.now()) / (1000 * 60 * 60 * 24)),
+        met: documentPlan.timeLimitMet || false,
+        description: documentPlan.timeLimitDescription || ""
+      } : undefined,
+      reason: documentPlan.routingReason || "",
+      userMessage: documentPlan.routingReason || "",
+      alternativeRoutes: documentPlan.alternativeRoutes as any,
+      classifiedAt: documentPlan.routingCompletedAt || new Date(),
+      classifiedBy: "claude-opus-4" as const
+    } : null;
+
+    const gateValidation = validateRoutingDecision(routingDecision);
+
+    if (!gateValidation.allowed) {
+      console.log(`[System 3] ❌ GATE BLOCKED: ${gateValidation.gateName}`);
+      console.log(`[System 3] Reason: ${gateValidation.error}`);
+
+      // Update case phase to BLOCKED
+      await prisma.dispute.update({
+        where: { id: caseId },
+        data: {
+          phase: "BLOCKED",
+          chatLocked: true,
+          lockReason: gateValidation.userMessage
+        }
+      });
+
+      // Update DocumentPlan with block details
+      await prisma.documentPlan.update({
+        where: { id: documentPlan.id },
+        data: {
+          routingStatus: "BLOCKED",
+          nextAction: gateValidation.nextAction
+        }
+      });
+
+      return NextResponse.json({
+        error: "Document generation blocked",
+        gate: gateValidation.gateName,
+        reason: gateValidation.error,
+        userMessage: gateValidation.userMessage,
+        nextAction: gateValidation.nextAction
+      }, { status: 403 });
+    }
+
+    console.log(`[System 3] ✅ All gates passed. Proceeding with generation.`);
+
+    // ========================================================================
+    // STEP 4: Transition to GENERATING phase
+    // ========================================================================
+
+    await prisma.dispute.update({
+      where: { id: caseId },
+      data: {
+        phase: "GENERATING",
+        chatLocked: true,
+        lockReason: "Generating legal documents..."
+      }
+    });
+
+    await prisma.documentPlan.update({
+      where: { id: documentPlan.id },
+      data: {
+        generationStartedAt: new Date()
+      }
+    });
+
+    // ========================================================================
+    // STEP 5: Delete old documents
+    // ========================================================================
+
     const existingDocs = await prisma.generatedDocument.deleteMany({
       where: { planId: documentPlan.id },
     });
 
     if (existingDocs.count > 0) {
-      console.log(`[Generate Docs] Deleted ${existingDocs.count} existing documents`);
+      console.log(`[System 3] Deleted ${existingDocs.count} existing documents`);
     }
 
-    // 6. Generate each document
-    const documentsToGenerate = complexityAnalysis.recommendedDocuments;
-    console.log(`[Generate Docs] Will generate: ${documentsToGenerate.join(", ")}`);
+    // ========================================================================
+    // STEP 6: Generate documents (ONLY from allowedDocs list)
+    // ========================================================================
 
-    const generatedDocs = [];
-    const failedDocs = [];
+    const documentsToGenerate = routingDecision!.allowedDocs;
+    console.log(`[System 3] Generating ${documentsToGenerate.length} documents:`, documentsToGenerate);
+
+    const generatedDocs: string[] = [];
+    const failedDocs: Array<{ formId: string; error: string }> = [];
 
     for (let i = 0; i < documentsToGenerate.length; i++) {
-      const docType = documentsToGenerate[i];
-      console.log(`[Generate Docs] ${i + 1}/${documentsToGenerate.length}: ${docType}...`);
+      const formId = documentsToGenerate[i];
+      const metadata = getFormMetadata(formId);
+
+      if (!metadata) {
+        console.error(`[System 3] ❌ No metadata for form ${formId}`);
+        failedDocs.push({ formId, error: "No form metadata" });
+        continue;
+      }
+
+      console.log(`[System 3] ${i + 1}/${documentsToGenerate.length}: Generating ${formId}...`);
 
       try {
         // Generate AI content
         const content = await generateAIContent({
-          documentType: docType,
+          formId,
           strategy,
           evidence,
           caseTitle: dispute.title,
+          routingDecision: routingDecision!
         });
 
-        if (!content || content.trim().length < 100) {
-          throw new Error(`Generated content too short: ${content?.length || 0} chars`);
+        // STRONG VALIDATION
+        const validation = await validateGeneratedDocument(content, formId);
+
+        if (!validation.valid) {
+          // FAIL IMMEDIATELY - don't save invalid document
+          console.error(`[System 3] ❌ ${formId} FAILED VALIDATION:`);
+          console.error(getValidationDetails(validation));
+
+          await prisma.generatedDocument.create({
+            data: {
+              planId: documentPlan.id,
+              caseId,
+              type: formId,
+              title: metadata.officialName,
+              description: `Official ${metadata.officialName}`,
+              order: i + 1,
+              content: "", // Empty - validation failed
+              status: "FAILED",
+              lastError: `Validation failed: ${validation.errors.join("; ")}`,
+              validationErrors: validation.errors,
+              validationWarnings: validation.warnings,
+              validatedAt: validation.validatedAt,
+              retryCount: 0
+            }
+          });
+
+          failedDocs.push({ formId, error: validation.errors.join("; ") });
+          continue;
         }
 
-        // Save to database
-        const doc = await prisma.generatedDocument.create({
-          data: {
-            planId: documentPlan.id,
-            caseId, // Direct reference for easy querying
-            type: docType,
-            title: getDocumentTitle(docType),
-            description: getDocumentDescription(docType),
-            order: i + 1,
-            content,
-            status: "COMPLETED",
-          },
-        });
-
-        generatedDocs.push(doc);
-        console.log(`[Generate Docs] ✅ ${docType} complete (${content.length} chars)`);
-
-      } catch (error) {
-        console.error(`[Generate Docs] ❌ ${docType} failed:`, error);
-
-        // Save failed document for retry
-        const failedDoc = await prisma.generatedDocument.create({
+        // Validation passed - save document
+        await prisma.generatedDocument.create({
           data: {
             planId: documentPlan.id,
             caseId,
-            type: docType,
-            title: getDocumentTitle(docType),
-            description: getDocumentDescription(docType),
+            type: formId,
+            title: metadata.officialName,
+            description: `Official ${metadata.officialName}`,
+            order: i + 1,
+            content,
+            status: "COMPLETED",
+            validationWarnings: validation.warnings.length > 0 ? validation.warnings : null,
+            validatedAt: validation.validatedAt,
+            retryCount: 0
+          }
+        });
+
+        generatedDocs.push(formId);
+        console.log(`[System 3] ✅ ${formId} completed (${content.length} chars)`);
+
+      } catch (error) {
+        console.error(`[System 3] ❌ ${formId} generation error:`, error);
+
+        await prisma.generatedDocument.create({
+          data: {
+            planId: documentPlan.id,
+            caseId,
+            type: formId,
+            title: metadata.officialName,
+            description: `Official ${metadata.officialName}`,
             order: i + 1,
             content: "",
             status: "FAILED",
             lastError: error instanceof Error ? error.message : "Unknown error",
-            retryCount: 0,
-          },
+            retryCount: 0
+          }
         });
 
-        failedDocs.push(failedDoc);
+        failedDocs.push({
+          formId,
+          error: error instanceof Error ? error.message : "Unknown error"
+        });
       }
     }
 
-    // 7. Create timeline event for audit trail
+    // ========================================================================
+    // STEP 7: Create timeline event
+    // ========================================================================
+
     await prisma.caseEvent.create({
       data: {
         caseId,
         type: "DOCUMENTS_GENERATED",
-        title: "Documents Generated",
-        description: `Generated ${generatedDocs.length}/${documentsToGenerate.length} documents (${complexityAnalysis.level} complexity)`,
+        title: "Legal Documents Generated",
+        description: `Generated ${generatedDocs.length}/${documentsToGenerate.length} documents via System 2 routing (${routingDecision!.forum})`,
         metadata: {
-          planId: documentPlan.id,
-          complexity: complexityAnalysis.level,
-          complexityScore: complexityAnalysis.score,
+          forum: routingDecision!.forum,
+          jurisdiction: routingDecision!.jurisdiction,
+          relationship: routingDecision!.relationship,
           successCount: generatedDocs.length,
           failedCount: failedDocs.length,
           documentTypes: documentsToGenerate,
-          duration: Date.now() - startTime,
-        } as any,
-      },
+          duration: Date.now() - startTime
+        } as any
+      }
+    });
+
+    // ========================================================================
+    // STEP 8: Transition to COMPLETED phase
+    // ========================================================================
+
+    await prisma.dispute.update({
+      where: { id: caseId },
+      data: {
+        phase: "COMPLETED",
+        chatLocked: true,
+        lockReason: "Documents generated. Case ready for action."
+      }
     });
 
     const duration = ((Date.now() - startTime) / 1000).toFixed(2);
-    console.log(`[Generate Docs] ✅ Complete! ${generatedDocs.length} success, ${failedDocs.length} failed (${duration}s)`);
+    console.log(`[System 3] ✅ Complete! ${generatedDocs.length} success, ${failedDocs.length} failed (${duration}s)`);
 
     return NextResponse.json({
       success: true,
-      message: `Generated ${generatedDocs.length} documents`,
-      plan: {
-        id: documentPlan.id,
-        complexity: documentPlan.complexity,
-        complexityScore: documentPlan.complexityScore,
-        documentType: documentPlan.documentType,
-      },
-      documents: [...generatedDocs, ...failedDocs],
       stats: {
         total: documentsToGenerate.length,
         success: generatedDocs.length,
         failed: failedDocs.length,
-        duration: `${duration}s`,
+        duration: `${duration}s`
       },
+      routing: {
+        forum: routingDecision!.forum,
+        jurisdiction: routingDecision!.jurisdiction,
+        confidence: routingDecision!.confidence
+      },
+      documents: generatedDocs,
+      failed: failedDocs,
+      phase: "COMPLETED"
     });
 
   } catch (error) {
-    console.error("[Generate Docs] ❌ Fatal error:", error);
-    
-    // Create error event
+    console.error(`[System 3] Fatal error:`, error);
+
+    // Try to update case to BLOCKED state
     try {
-      await prisma.caseEvent.create({
+      await prisma.dispute.update({
+        where: { id: caseId },
         data: {
-          caseId,
-          type: "DOCUMENTS_FAILED",
-          title: "Document Generation Failed",
-          description: error instanceof Error ? error.message : "Unknown error occurred",
-          metadata: {
-            error: error instanceof Error ? error.message : "Unknown error",
-            duration: Date.now() - startTime,
-          } as any,
-        },
+          phase: "BLOCKED",
+          lockReason: "Document generation failed"
+        }
       });
-    } catch (eventError) {
-      console.error("[Generate Docs] Failed to create error event:", eventError);
+    } catch (e) {
+      // Ignore
     }
 
     return NextResponse.json(
-      { 
-        error: error instanceof Error ? error.message : "Failed to generate documents",
-        details: error instanceof Error ? error.stack : undefined,
+      {
+        error: "Document generation failed",
+        details: error instanceof Error ? error.message : "Unknown error"
       },
       { status: 500 }
     );
   }
-}
-
-// Helper: Get human-readable document title
-function getDocumentTitle(type: string): string {
-  const titles: Record<string, string> = {
-    case_summary: "Case Summary",
-    demand_letter: "Formal Demand Letter",
-    employment_claim: "Employment Tribunal Claim (ET1)",
-    grievance_letter: "Formal Grievance Letter",
-    breach_notice: "Contract Breach Notice",
-    damages_calculation: "Damages Calculation Schedule",
-    complaint_letter: "Formal Complaint Letter",
-    ccj_response: "CCJ Defence Response",
-    dispute_notice: "Dispute Notice",
-    claim_form: "Court Claim Form (N1)",
-    debt_validation: "Debt Validation Request",
-    dispute_letter: "Debt Dispute Letter",
-    statute_barred_notice: "Statute Barred Notice",
-    appeal_letter: "PCN Appeal Letter",
-    witness_statement: "Witness Statement",
-    evidence_bundle: "Evidence Bundle & Index",
-    chronology: "Chronology of Events",
-  };
-  return titles[type] || type.replace(/_/g, " ").replace(/\b\w/g, l => l.toUpperCase());
-}
-
-// Helper: Get document description
-function getDocumentDescription(type: string): string {
-  const descriptions: Record<string, string> = {
-    case_summary: "Comprehensive overview of your case, facts, and legal position",
-    demand_letter: "Formal letter demanding resolution before legal action",
-    employment_claim: "Official claim form for employment tribunal proceedings",
-    grievance_letter: "Formal written grievance to employer",
-    breach_notice: "Notice of contract breach and demand for remedy",
-    damages_calculation: "Detailed breakdown of financial losses and compensation sought",
-    complaint_letter: "Formal complaint to service provider or regulator",
-    ccj_response: "Defence against County Court Judgment claim",
-    dispute_notice: "Official notice of dispute to opposing party",
-    claim_form: "Court claim form for civil proceedings",
-    debt_validation: "Request for debt validation under consumer law",
-    dispute_letter: "Letter disputing alleged debt",
-    statute_barred_notice: "Notice that debt is statute-barred",
-    appeal_letter: "Appeal against parking charge notice",
-    witness_statement: "Formal statement of evidence for court",
-    evidence_bundle: "Organized collection of all case evidence",
-    chronology: "Timeline of all key events in chronological order",
-  };
-  return descriptions[type] || "";
 }

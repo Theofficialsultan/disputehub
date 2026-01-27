@@ -25,6 +25,18 @@ function checkIfReadyForDocuments(strategy: any): boolean {
   return true;
 }
 
+// Phase 8.5: System messages for locked chat phases
+function getSystemMessageForPhase(phase: string): string {
+  const messages: Record<string, string> = {
+    ROUTING: "We're analyzing the best legal route for your case. This will take a moment...",
+    GENERATING: "Your legal documents are being generated. You'll be able to download them shortly.",
+    COMPLETED: "Your documents are ready! Check the Documents section to download them.",
+    BLOCKED: "We've identified an issue that prevents document generation. Please review the information in the Documents section."
+  };
+  
+  return messages[phase] || "Processing...";
+}
+
 // GET /api/disputes/[id]/messages - Fetch all messages for a case
 export async function GET(
   request: Request,
@@ -112,6 +124,20 @@ export async function POST(
     if (dispute.mode !== "GUIDED") {
       return NextResponse.json(
         { error: "Not a guided case" },
+        { status: 403 }
+      );
+    }
+
+    // Phase 8.5: Check if chat is locked (one-way control flow)
+    if (dispute.chatLocked) {
+      const systemMessage = getSystemMessageForPhase(dispute.phase);
+      return NextResponse.json(
+        {
+          error: "Chat is locked",
+          reason: dispute.lockReason,
+          phase: dispute.phase,
+          systemMessage
+        },
         { status: 403 }
       );
     }

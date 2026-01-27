@@ -10,29 +10,36 @@
 
 import { openai } from "./openai";
 import type { CaseStrategy, EvidenceItem } from "@prisma/client";
+import type { OfficialFormID } from "@/lib/legal/form-registry";
+import type { RoutingDecision } from "@/lib/legal/routing-types";
 
 interface GenerateContentParams {
-  documentType: string;
+  formId: OfficialFormID; // Official form ID (e.g., UK-ET1-EMPLOYMENT-TRIBUNAL-2024)
   strategy: CaseStrategy;
   evidence: EvidenceItem[];
   caseTitle: string;
+  routingDecision: RoutingDecision; // System 2 routing context
+  
+  // Legacy support
+  documentType?: string;
 }
 
 export async function generateAIContent(params: GenerateContentParams): Promise<string> {
-  const { documentType, strategy, evidence, caseTitle } = params;
+  const formId = params.formId || params.documentType || "unknown";
+  const { strategy, evidence, caseTitle } = params;
 
-  console.log(`[AI Content] Generating ${documentType}...`);
+  console.log(`[AI Content] Generating ${formId}...`);
 
   try {
     // Try OpenAI generation first
     const aiContent = await generateWithOpenAI(params);
     const cleanedContent = cleanMarkdownArtifacts(aiContent);
     
-    console.log(`[AI Content] ✅ Generated ${cleanedContent.length} chars for ${documentType}`);
+    console.log(`[AI Content] ✅ Generated ${cleanedContent.length} chars for ${formId}`);
     return cleanedContent;
 
   } catch (error) {
-    console.warn(`[AI Content] ⚠️  OpenAI failed, using fallback for ${documentType}:`, error);
+    console.warn(`[AI Content] ⚠️  OpenAI failed, using fallback for ${formId}:`, error);
     
     // Fallback to template-based generation
     const fallbackContent = generateFallbackContent(params);
@@ -42,8 +49,9 @@ export async function generateAIContent(params: GenerateContentParams): Promise<
 }
 
 async function generateWithOpenAI(params: GenerateContentParams): Promise<string> {
-  const { documentType, strategy, evidence, caseTitle } = params;
-  const prompt = buildDocumentPrompt(documentType, strategy, evidence, caseTitle);
+  const formId = params.formId || params.documentType || "unknown";
+  const { strategy, evidence, caseTitle } = params;
+  const prompt = buildDocumentPrompt(formId, strategy, evidence, caseTitle);
 
   const completion = await openai.chat.completions.create({
     model: "gpt-4o",
