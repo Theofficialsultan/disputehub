@@ -11,16 +11,23 @@ import { z } from "zod";
 
 // Helper: Check if strategy is complete enough for document generation
 function checkIfReadyForDocuments(strategy: any): boolean {
+  // DEV MODE: Lower thresholds for faster testing
+  const DEV_MODE = process.env.NODE_ENV === "development";
+  
   // Must have dispute type
   if (!strategy.disputeType) return false;
   
-  // Must have at least 5 key facts
+  // Must have key facts (2 for dev, 5 for prod)
   const facts = Array.isArray(strategy.keyFacts) ? strategy.keyFacts : [];
-  if (facts.length < 5) return false;
+  const minFacts = DEV_MODE ? 2 : 5;
+  if (facts.length < minFacts) return false;
   
-  // Must have a desired outcome (at least 20 characters)
+  // Must have a desired outcome (10 chars for dev, 20 for prod)
   const outcome = strategy.desiredOutcome || "";
-  if (outcome.length < 20) return false;
+  const minOutcome = DEV_MODE ? 10 : 20;
+  if (outcome.length < minOutcome) return false;
+  
+  console.log(`[Ready Check] ${DEV_MODE ? "DEV MODE" : "PROD MODE"}: ${facts.length}/${minFacts} facts, ${outcome.length}/${minOutcome} outcome chars`);
   
   return true;
 }

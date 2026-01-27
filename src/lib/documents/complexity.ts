@@ -25,7 +25,11 @@ export function calculateComplexity(
   strategy: CaseStrategy,
   evidenceCount: number
 ): ComplexityScore {
-  let score = 0;
+  // DEV MODE: Boost scores for faster testing
+  const DEV_MODE = process.env.NODE_ENV === "development";
+  const devBoost = DEV_MODE ? 20 : 0; // Add 20 points in dev mode
+  
+  let score = devBoost;
   const breakdown = {
     factCount: 0,
     evidenceCount: 0,
