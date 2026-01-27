@@ -145,17 +145,61 @@ Be thorough and professional. 500-800 words.`,
 
     employment_claim: `${baseInfo}
 
-Generate an EMPLOYMENT CLAIM DOCUMENT. Include:
-- Claimant Information Section (leave blank for user to fill)
-- Employer Information Section (extract from facts if available)
-- Nature of Claim
-- Detailed Facts & Circumstances
-- Evidence Supporting Claim
-- Violations & Harm Suffered
-- Requested Relief & Compensation
-- Declaration Statement
+Generate an EMPLOYMENT TRIBUNAL CLAIM (ET1 Form Style) document. This should be structured like an actual claim form:
 
-Professional legal document format. 600-900 words.`,
+SECTION 1: CLAIMANT DETAILS
+Name: [Leave blank for user]
+Address: [Leave blank]
+Contact: [Leave blank]
+Date of Birth: [Leave blank]
+
+SECTION 2: RESPONDENT (EMPLOYER) DETAILS
+Name: ${strategy.keyFacts?.find((f: string) => f.toLowerCase().includes('company') || f.toLowerCase().includes('employer')) || '[Extract from facts or leave for user]'}
+Address: [Extract if available, otherwise leave blank]
+Type of Business: [Extract from facts if mentioned]
+
+SECTION 3: EMPLOYMENT DETAILS
+Start Date: [Extract from facts if mentioned]
+End Date: [Extract from facts if mentioned]  
+Job Title: [Extract from facts if mentioned]
+Working Hours: [Extract from facts]
+Pay: [Extract from facts]
+
+SECTION 4: TYPE OF CLAIM(S)
+State the specific type(s) of claim (tick all that apply conceptually):
+- Unfair Dismissal
+- Breach of Contract (unpaid wages/holiday pay)
+- Discrimination (specify type if apparent)
+- Other: [specify]
+
+SECTION 5: CLAIM DETAILS - WHAT HAPPENED
+Provide a chronological, factual account in first person:
+
+[Paragraph 1: Background]
+When and how employment started, what was agreed...
+
+[Paragraph 2-4: The Issues]
+Detailed account of what happened, when, who was involved...
+Reference specific dates and incidents from the facts...
+
+[Paragraph 5: Evidence]
+"I have the following evidence to support my claim: [list evidence]"
+
+[Paragraph 6: Why it's unlawful/breach]
+Explain why employer's actions were wrong/unlawful...
+
+SECTION 6: WHAT YOU WANT THE TRIBUNAL TO ORDER
+- Compensation in the amount of £[specify from desired outcome]
+- [Any other remedies - reinstatement, etc.]
+
+DECLARATION
+I confirm that the information given on this form is correct to the best of my knowledge.
+
+Signed: _________________ Date: ${today}
+
+IMPORTANT: Write as if the claimant is completing the form themselves in first person. Make it factual, chronological, and professional.
+
+600-900 words.`,
 
     evidence_list: `${baseInfo}
 
@@ -231,16 +275,110 @@ Professional financial/legal document. 400-600 words.`,
 
     complaint_letter: `${baseInfo}
 
-Generate a FORMAL COMPLAINT LETTER. Should:
-- State the complaint clearly
-- Provide factual background
-- Reference evidence
-- Explain impact/harm
-- Request specific action
-- Set reasonable deadline
-- Professional but firm tone
+Generate a FORMAL COMPLAINT LETTER in proper business letter format. This should be addressed to the company/individual and include:
 
-Business letter format. 400-600 words.`,
+LETTER STRUCTURE:
+[Sender's Name - leave blank for user to fill]
+[Sender's Address - leave blank]
+
+[Recipient Name/Company]
+[Recipient Address - if known from facts, otherwise "To Whom It May Concern"]
+
+Date: [Current Date]
+
+Dear Sir/Madam [or specific name if known],
+
+Re: Formal Complaint - [Brief subject line from case]
+
+OPENING PARAGRAPH:
+- State you are writing to make a formal complaint
+- Brief one-sentence summary of the issue
+- Reference any relevant dates/agreements
+
+MAIN BODY (2-3 paragraphs):
+- Chronological account of what happened
+- Specific facts and dates
+- Reference to evidence ("I have photographic evidence showing...")
+- What went wrong and why it's unacceptable
+
+IMPACT PARAGRAPH:
+- How this has affected you (financially, emotionally, practically)
+- Any losses incurred
+
+RESOLUTION DEMANDED:
+- Clear statement of what you want (payment, apology, action taken)
+- Specific amount if financial
+- Timeline for response (typically 14 days)
+
+CLOSING:
+- Professional but firm tone
+- State next steps if no response (e.g., "further action", "formal proceedings")
+- "I look forward to your prompt response"
+
+Yours faithfully/sincerely,
+[Signature line]
+
+IMPORTANT: Write this as an actual letter a person would send, NOT a case summary. Use first person ("I"), direct address, and letter conventions.
+
+400-600 words.`,
+
+    grievance_letter: `${baseInfo}
+
+Generate a FORMAL GRIEVANCE LETTER for ${strategy.disputeType === 'employment' ? 'workplace issues' : 'dispute resolution'}. This must be a proper letter format, NOT a case summary.
+
+LETTER STRUCTURE:
+[Your Name]
+[Your Address]
+[Your Email/Phone]
+
+[Employer/Company Name]
+[Company Address]
+
+Date: [Current Date]
+
+Dear [Manager Name/Sir/Madam],
+
+Re: Formal Grievance - [Subject from case facts]
+
+OPENING:
+I am writing to raise a formal grievance under [company grievance procedure / UK employment law] regarding [specific issue from facts].
+
+BACKGROUND (1-2 paragraphs):
+- When did you start working/the relationship begin
+- What was agreed (hours, pay, terms)
+- Context of the dispute
+
+THE GRIEVANCE (2-3 paragraphs):
+- Detailed account of what happened chronologically
+- Specific dates, times, locations
+- What was said/done by whom
+- Reference evidence: "I have photographic evidence dated X showing Y"
+- Why this breaches agreement/is unfair/unlawful
+
+IMPACT ON YOU:
+- Financial loss (specific amounts)
+- Stress/health impact
+- Other consequences
+
+WHAT I EXPECT:
+- Specific remedy sought (payment of £X, apology, investigation)
+- Timeline for response (usually 5-10 working days)
+- Reference to next steps if unresolved
+
+CLOSING:
+I trust this matter will be resolved swiftly and fairly. I am willing to meet to discuss this grievance further.
+
+I look forward to your written response within [X] working days.
+
+Yours sincerely,
+[Your signature]
+[Your name]
+
+Enclosures: [List evidence - "Photographic evidence (3 images)", "Email correspondence", etc.]
+
+CRITICAL: This MUST be a first-person letter someone would actually send to their employer/opponent. NOT a third-person case summary. Use "I", "you", "my", proper letter format.
+
+500-700 words.`,
 
     property_dispute_notice: `${baseInfo}
 
@@ -281,6 +419,218 @@ Generate a DISPUTE RESOLUTION LETTER. Include:
 - Professional negotiation tone
 
 Business letter format. 400-600 words.`,
+
+    breach_notice: `${baseInfo}
+
+Generate a BREACH OF CONTRACT NOTICE letter. Proper business letter format:
+
+[YOUR NAME]
+[YOUR ADDRESS]
+
+[OTHER PARTY NAME]
+[OTHER PARTY ADDRESS]
+
+Date: [Current Date]
+
+Dear Sir/Madam,
+
+Re: Notice of Breach of Contract - ${caseTitle}
+
+FORMAL NOTICE that you are in breach of the contract/agreement between us.
+
+CONTRACT DETAILS:
+- Date of Agreement: [Extract from facts]
+- Nature of Contract: [Extract from facts]
+- Your Obligations: [State what they agreed to do]
+
+THE BREACH:
+[Detailed account of how they breached - what they did/didn't do, when]
+${Array.isArray(strategy.keyFacts) ? strategy.keyFacts.slice(0, 4).map((f: string, i: number) => `${i + 1}. ${f}`).join("\n") : ""}
+
+EVIDENCE:
+I have evidence of this breach including: [reference evidence]
+
+LOSSES/DAMAGES:
+As a result of your breach, I have suffered: [financial/other losses from desired outcome]
+
+REMEDY REQUIRED:
+${strategy.desiredOutcome || "You must remedy this breach by [specific action]"}
+
+You have 14 days from the date of this letter to:
+1. Acknowledge this breach
+2. Provide full remedy as stated above
+3. Compensate me for losses incurred
+
+Failure to comply will result in legal proceedings without further notice.
+
+Yours faithfully,
+[YOUR SIGNATURE]
+[YOUR NAME]
+
+500-700 words in actual letter format, first person.`,
+
+    damages_calculation: `${baseInfo}
+
+Generate a DAMAGES CALCULATION & SCHEDULE document showing financial losses:
+
+SCHEDULE OF DAMAGES - ${caseTitle}
+Date: ${today}
+
+CLAIMANT DETAILS:
+Name: [User to complete]
+Claim Reference: [Auto-generated]
+
+BASIS OF CLAIM:
+[Brief paragraph explaining the breach/wrong and why damages are owed]
+
+CALCULATION OF DAMAGES:
+
+1. DIRECT FINANCIAL LOSSES:
+   - [Item from facts]: £___
+   - [Item from facts]: £___
+   Sub-total: £___
+
+2. CONSEQUENTIAL LOSSES:
+   - [Any knock-on losses mentioned]: £___
+   Sub-total: £___
+
+3. INTEREST:
+   - Interest on late payment (8% statutory): £___
+   - Period: [X] days from [date] to [date]
+
+4. COSTS & EXPENSES:
+   - Legal advice/documents: £___
+   - Travel/time: £___
+   Sub-total: £___
+
+TOTAL CLAIM: £[Sum from desired outcome or calculate from facts]
+
+BREAKDOWN NOTES:
+[Paragraph explaining each calculation, referencing evidence where amounts come from]
+
+EVIDENCE SUPPORTING CALCULATION:
+${evidence.length > 0 ? evidence.map((e, i) => `${i + 1}. ${e.title || e.fileName} - ${e.description || 'Supporting documentation'}`).join("\n") : "See attached evidence bundle"}
+
+MITIGATION:
+[State any steps taken to minimize losses]
+
+This schedule represents the genuine losses suffered as a result of [respondent's] breach/wrongdoing.
+
+Signed: _________________ Date: ${today}
+
+400-600 words, professional financial document.`,
+
+    dispute_notice: `${baseInfo}
+
+Generate a FORMAL DISPUTE NOTICE letter:
+
+[YOUR NAME]
+[YOUR ADDRESS]
+
+[RECIPIENT NAME]
+[RECIPIENT ADDRESS]
+
+Date: ${today}
+
+WITHOUT PREJUDICE - FORMAL NOTICE
+
+Dear [Sir/Madam / Name],
+
+Re: FORMAL NOTICE OF DISPUTE - ${caseTitle}
+
+This letter serves as formal notice that a dispute has arisen between us regarding [subject from facts].
+
+BACKGROUND:
+[Paragraph explaining the relationship/agreement and when it started]
+
+THE DISPUTE:
+I am in dispute with you concerning the following matters:
+
+${Array.isArray(strategy.keyFacts) ? strategy.keyFacts.map((f: string, i: number) => `${i + 1}. ${f}`).join("\n\n") : ""}
+
+MY POSITION:
+${strategy.desiredOutcome || "[State your position clearly]"}
+
+EVIDENCE:
+${evidence.length > 0 ? `I have substantial evidence supporting my position, including: ${evidence.map(e => e.title || e.fileName).join(", ")}.` : "I have evidence to support my position."}
+
+PROPOSED RESOLUTION:
+I propose that this dispute be resolved as follows:
+[State specifically what you want to happen - payment, action, apology, etc.]
+
+NEXT STEPS:
+I request that you respond to this notice within 14 days confirming:
+1. Whether you accept my position
+2. If not, your counter-proposal for resolution
+3. Your willingness to engage in mediation/negotiation
+
+If no satisfactory response is received, I will have no choice but to pursue formal legal remedies including [court proceedings / tribunal claim / arbitration] without further notice.
+
+I remain open to resolving this matter amicably and swiftly.
+
+Yours [faithfully/sincerely],
+
+[YOUR SIGNATURE]
+[YOUR NAME]
+
+Copies: [Any copied parties]
+
+500-700 words, formal but conciliatory tone.`,
+
+    claim_form: `${baseInfo}
+
+Generate a PARTICULARS OF CLAIM document (for County Court / Small Claims):
+
+IN THE [COUNTY COURT / SMALL CLAIMS COURT]
+Claim Number: [To be allocated]
+
+BETWEEN:
+
+[CLAIMANT NAME] - Claimant
+-and-
+[DEFENDANT NAME from facts] - Defendant
+
+PARTICULARS OF CLAIM
+
+1. The Claimant is [describe claimant - individual, self-employed, etc.]
+
+2. The Defendant is [describe defendant from facts - company, individual, etc.]
+
+3. THE AGREEMENT
+   On or around [date from facts], [describe the agreement/contract between parties]
+   [Detail what was agreed - work, payment, terms]
+
+4. THE CLAIMANT'S PERFORMANCE
+   ${Array.isArray(strategy.keyFacts) ? strategy.keyFacts.filter((f: string) => f.toLowerCase().includes('work') || f.toLowerCase().includes('did')).map((f: string, i: number) => `${i + 4}. ${f}`).join("\n   ") : "The Claimant performed their obligations under the agreement."}
+
+5. THE DEFENDANT'S BREACH
+   [State what defendant did wrong - failed to pay, breached terms, etc.]
+   [Include specific dates and amounts]
+
+6. EVIDENCE
+   The Claimant relies upon: [list evidence items]
+
+7. LOSS AND DAMAGE
+   As a result of the Defendant's breach, the Claimant has suffered loss:
+   - [Financial loss]: £___
+   - [Other losses]: £___
+   
+8. INTEREST
+   The Claimant claims interest pursuant to [section 69 County Courts Act 1984 / Late Payment Act]
+
+AND THE CLAIMANT CLAIMS:
+
+(1) Payment of £[amount from desired outcome]
+(2) Interest on the sum claimed
+(3) Costs
+
+STATEMENT OF TRUTH
+I believe that the facts stated in these Particulars of Claim are true. I understand that proceedings for contempt of court may be brought against anyone who makes, or causes to be made, a false statement in a document verified by a statement of truth without an honest belief in its truth.
+
+Signed: _________________ Date: ${today}
+[CLAIMANT NAME]
+
+600-800 words, formal legal document style with numbered paragraphs.`,
   };
 
   return prompts[documentType] || prompts.case_summary;
@@ -311,6 +661,70 @@ EVIDENCE:
 ${p.evidence.length > 0 ? p.evidence.map((e, i) => `${i + 1}. ${e.title || e.fileName}`).join("\n") : "No evidence provided"}
 
 This case summary provides an overview of the dispute and forms the basis for further legal action if required.`,
+
+    grievance_letter: (p) => `[YOUR NAME]
+[YOUR ADDRESS]
+[YOUR EMAIL/PHONE]
+
+[EMPLOYER/COMPANY NAME]
+[COMPANY ADDRESS]
+
+Date: ${today}
+
+Dear Sir/Madam,
+
+Re: Formal Grievance - ${p.caseTitle}
+
+I am writing to raise a formal grievance regarding the following matter:
+
+${facts.slice(0, 3).join("\n\n")}
+
+${p.strategy.desiredOutcome ? `\nRESOLUTION SOUGHT:\n${p.strategy.desiredOutcome}` : ""}
+
+${p.evidence.length > 0 ? `\nI have supporting evidence including: ${p.evidence.map(e => e.title || e.fileName).join(", ")}.` : ""}
+
+I request a written response to this grievance within 10 working days. If this matter cannot be resolved informally, I am prepared to pursue formal proceedings.
+
+I look forward to your prompt response.
+
+Yours faithfully,
+
+[YOUR SIGNATURE]
+[YOUR NAME]
+
+Enclosures: Evidence as listed above`,
+
+    complaint_letter: (p) => `[YOUR NAME]
+[YOUR ADDRESS]
+
+[RECIPIENT NAME/COMPANY]
+[RECIPIENT ADDRESS]
+
+Date: ${today}
+
+Dear Sir/Madam,
+
+Re: Formal Complaint - ${p.caseTitle}
+
+I am writing to make a formal complaint regarding the following matter.
+
+COMPLAINT DETAILS:
+${facts.slice(0, 4).join("\n\n")}
+
+IMPACT:
+This situation has caused me significant inconvenience and ${p.strategy.desiredOutcome ? 'financial loss' : 'distress'}.
+
+${p.evidence.length > 0 ? `\nEVIDENCE:\nI have documentary evidence supporting this complaint, including: ${p.evidence.map(e => e.title || e.fileName).join(", ")}.` : ""}
+
+RESOLUTION REQUIRED:
+${p.strategy.desiredOutcome || "I require this matter to be investigated and resolved promptly."}
+
+Please respond to this complaint in writing within 14 days. If I do not receive a satisfactory response, I will have no choice but to escalate this matter further.
+
+Yours faithfully,
+
+[YOUR SIGNATURE]
+[YOUR NAME]`,
 
     demand_letter: (p) => `[YOUR NAME]
 [YOUR ADDRESS]
