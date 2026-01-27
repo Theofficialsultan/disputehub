@@ -7,8 +7,23 @@ import { getSystemPrompt, formatConversationHistory } from "@/lib/ai/prompts";
 import { detectExtremeCase } from "@/lib/safety/detection";
 import { getSafetyMessage } from "@/lib/safety/messages";
 import { extractCaseStrategy, mergeStrategy } from "@/lib/ai/strategy";
-import { executeDecisionGate } from "@/lib/strategy/decision-gate";
 import { z } from "zod";
+
+// Helper: Check if strategy is complete enough for document generation
+function checkIfReadyForDocuments(strategy: any): boolean {
+  // Must have dispute type
+  if (!strategy.disputeType) return false;
+  
+  // Must have at least 5 key facts
+  const facts = Array.isArray(strategy.keyFacts) ? strategy.keyFacts : [];
+  if (facts.length < 5) return false;
+  
+  // Must have a desired outcome (at least 20 characters)
+  const outcome = strategy.desiredOutcome || "";
+  if (outcome.length < 20) return false;
+  
+  return true;
+}
 
 // GET /api/disputes/[id]/messages - Fetch all messages for a case
 export async function GET(
@@ -296,24 +311,24 @@ export async function POST(
               },
             });
 
-            // PHASE 8.2.5 - DECISION GATE (DISABLED FOR NOW)
-            // TODO: Re-enable automatic decision gate once AI conversation quality is better
-            // For now, documents must be manually triggered via admin endpoint
-            console.log(`[API] Decision gate DISABLED - documents must be manually triggered`);
+            // AUTOMATIC DOCUMENT GENERATION
+            // If we have enough information, trigger document generation
+            const shouldGenerate = checkIfReadyForDocuments(merged);
             
-            // Uncomment below to re-enable automatic document generation:
-            // console.log(`[API] Checking decision gate for case ${caseId}...`);
-            // try {
-            //   const gateTriggered = await executeDecisionGate(caseId);
-            //   if (gateTriggered) {
-            //     console.log(`[API] ✅ Decision Gate TRIGGERED for case ${caseId}`);
-            //   } else {
-            //     console.log(`[API] ⏭️  Decision Gate NOT triggered (requirements not met)`);
-            //   }
-            // } catch (gateError) {
-            //   console.error("[API] ❌ Decision Gate Error:", gateError);
-            //   // Don't fail the request if decision gate fails
-            // }
+            if (shouldGenerate) {
+              console.log(`[API] ✅ Strategy complete! Triggering document generation...`);
+              
+              // Trigger document generation asynchronously (don't wait)
+              fetch(`${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/api/disputes/${caseId}/documents/generate`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+              }).catch(err => {
+                console.error("[API] Document generation trigger failed:", err);
+              });
+            } else {
+              console.log(`[API] Strategy not yet complete. Continue conversation.`);
+            }
+
           }
         } catch (strategyError) {
           // Strategy extraction is best-effort

@@ -11,8 +11,7 @@ import { toast } from "sonner";
 import { StrategySummaryPanel } from "./StrategySummaryPanel";
 import { CaseControlCenter } from "@/components/case/CaseControlCenter";
 import { EvidenceSection } from "@/components/evidence/EvidenceSection";
-import { DocumentGenerationStatus } from "@/components/documents/DocumentGenerationStatus";
-import { GenerateDocumentsButton } from "@/components/case/GenerateDocumentsButton";
+import { DocumentStatus } from "@/components/documents/DocumentStatus";
 
 type DisputeData = {
   id: string;
@@ -51,8 +50,6 @@ export function CaseChatClient({ dispute }: CaseChatClientProps) {
   const [isRestricted, setIsRestricted] = useState(false);
   const [strategy, setStrategy] = useState<CaseStrategy | null>(null);
   const [isStrategyLoading, setIsStrategyLoading] = useState(true);
-  const [documentPlan, setDocumentPlan] = useState<any>(null);
-  const [isDocumentsGenerating, setIsDocumentsGenerating] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -60,7 +57,6 @@ export function CaseChatClient({ dispute }: CaseChatClientProps) {
   useEffect(() => {
     loadMessages();
     loadStrategy();
-    loadDocuments();
   }, []);
 
   // Auto-scroll to bottom when messages change
@@ -126,34 +122,6 @@ export function CaseChatClient({ dispute }: CaseChatClientProps) {
     }
   };
 
-  const loadDocuments = async () => {
-    try {
-      const response = await fetch(`/api/disputes/${dispute.id}/documents`);
-
-      if (!response.ok) {
-        return; // No documents yet
-      }
-
-      const data = await response.json();
-      
-      // API returns { plan, documents } not { documentPlan }
-      if (data.plan && data.documents) {
-        const combinedPlan = {
-          ...data.plan,
-          documents: data.documents,
-        };
-        setDocumentPlan(combinedPlan);
-
-        // Check if any documents are generating
-        const hasGenerating = data.documents.some(
-          (doc: any) => doc.status === "GENERATING" || doc.status === "PENDING"
-        );
-        setIsDocumentsGenerating(hasGenerating);
-      }
-    } catch (err) {
-      console.error("Error loading documents:", err);
-    }
-  };
 
   const handleSend = async () => {
     if (!input.trim() || isTyping || isRestricted) return;
@@ -380,27 +348,6 @@ export function CaseChatClient({ dispute }: CaseChatClientProps) {
             </div>
           </div>
 
-          {/* Generate Documents Button */}
-          {!dispute.strategyLocked && (
-            <div className="px-6 pb-3">
-              <div className="p-4 rounded-2xl bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-500/20">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="text-sm font-semibold text-white mb-1">Ready to proceed?</h3>
-                    <p className="text-xs text-slate-400">Generate your legal documents when you're satisfied with the conversation</p>
-                  </div>
-                  <GenerateDocumentsButton
-                    caseId={dispute.id}
-                    isLocked={dispute.strategyLocked}
-                    onGenerationStarted={() => {
-                      loadDocuments();
-                      toast.success("Check the Documents section for progress");
-                    }}
-                  />
-                </div>
-              </div>
-            </div>
-          )}
 
           {/* Chat Input - Fixed at bottom of left panel */}
           <ChatInput
@@ -425,15 +372,10 @@ export function CaseChatClient({ dispute }: CaseChatClientProps) {
                 isLoading={isStrategyLoading}
               />
 
-              {/* Document Generation Status - Always Visible */}
-              <DocumentGenerationStatus
+              {/* Document Status */}
+              <DocumentStatus
                 caseId={dispute.id}
-                documentPlan={documentPlan}
-                isGenerating={isDocumentsGenerating}
-                onGenerationComplete={() => {
-                  loadDocuments();
-                  setIsDocumentsGenerating(false);
-                }}
+                isLocked={dispute.strategyLocked}
               />
 
               {/* Evidence Section */}
