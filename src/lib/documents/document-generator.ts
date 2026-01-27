@@ -361,9 +361,27 @@ export async function generateDocument(
 
     // Step 3: Generate content using AI (pass evidence items)
     const aiContent = await generateAIContent(documentType, strategy, evidenceItems);
+    console.log(`[Document Gen] AI Content Length: ${aiContent.length} chars`);
+    console.log(`[Document Gen] AI Content Preview: ${aiContent.substring(0, 200)}...`);
+
+    // HARD FAIL: AI content must exist
+    if (!aiContent || aiContent.trim().length < 50) {
+      throw new Error(
+        `AI content generation failed for ${documentType}. Length: ${aiContent?.length ?? 0}. Content: "${aiContent}"`
+      );
+    }
 
     // Step 4: Convert to HTML (pass evidence items for embedding)
     const html = convertToHTML(documentType, aiContent, strategy, documentCount, evidenceItems);
+    console.log(`[Document Gen] HTML Length: ${html.length} chars`);
+    console.log(`[Document Gen] HTML Preview: ${html.substring(0, 500)}...`);
+
+    // HARD FAIL: HTML must have substantial content
+    if (!html || html.trim().length < 300) {
+      throw new Error(
+        `HTML generation failed for ${documentType}. Length: ${html?.length ?? 0}. Check convertToHTML() output.`
+      );
+    }
 
     // Step 5: Convert HTML to PDF
     const pdfBuffer = await convertHTMLToPDF(html);
