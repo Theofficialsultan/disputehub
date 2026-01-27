@@ -5,6 +5,7 @@ import { FileText, CheckCircle, Clock, AlertCircle, Download, RefreshCw } from "
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
+import { GenerateButton } from "./GenerateButton";
 
 interface Document {
   id: string;
@@ -130,16 +131,24 @@ export function DocumentStatus({ caseId }: DocumentStatusProps) {
               )}
             </p>
           </div>
-          {plan && (
-            <div className="text-right">
-              <div className="text-xs font-medium text-purple-400">
-                {plan.complexity}
+          <div className="flex items-center gap-3">
+            {/* Generate Button (DEV/TEST) */}
+            <GenerateButton 
+              caseId={caseId}
+              onGenerated={loadDocuments}
+            />
+            
+            {plan && (
+              <div className="text-right">
+                <div className="text-xs font-medium text-purple-400">
+                  {plan.complexity}
+                </div>
+                <div className="text-xs text-slate-500">
+                  Score: {plan.complexityScore}/100
+                </div>
               </div>
-              <div className="text-xs text-slate-500">
-                Score: {plan.complexityScore}/100
-              </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
 
         {/* Progress Bar */}
