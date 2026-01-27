@@ -65,11 +65,6 @@ export function DocumentStatus({ caseId, isLocked }: DocumentStatusProps) {
     URL.revokeObjectURL(url);
   };
 
-  // Don't show anything if not locked and no documents
-  if (!isLocked && documents.length === 0) {
-    return null;
-  }
-
   return (
     <div className="rounded-2xl bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700 overflow-hidden">
       <div className="px-6 py-4 border-b border-slate-700 flex items-center gap-3">
@@ -77,13 +72,11 @@ export function DocumentStatus({ caseId, isLocked }: DocumentStatusProps) {
           <FileText className="h-5 w-5 text-purple-400" />
         </div>
         <div className="flex-1">
-          <h3 className="text-base font-semibold text-white">
-            {isLocked ? "Your Documents" : "Preparing Documents"}
-          </h3>
+          <h3 className="text-base font-semibold text-white">Documents</h3>
           <p className="text-xs text-slate-400 mt-0.5">
             {isLocked
-              ? `${documents.length} document${documents.length !== 1 ? "s" : ""} generated`
-              : "AI is gathering information..."}
+              ? `${documents.length} document${documents.length !== 1 ? "s" : ""} ready`
+              : "Your case documents will appear here"}
           </p>
         </div>
       </div>
@@ -95,9 +88,10 @@ export function DocumentStatus({ caseId, isLocked }: DocumentStatusProps) {
         </div>
       ) : documents.length === 0 ? (
         <div className="p-6 text-center">
-          <Clock className="h-8 w-8 text-slate-500 mx-auto mb-2" />
-          <p className="text-sm text-slate-400">
-            Continue chatting with the AI to build your case
+          <FileText className="h-12 w-12 text-slate-600 mx-auto mb-3 opacity-50" />
+          <p className="text-sm font-medium text-slate-300 mb-1">No Documents Yet</p>
+          <p className="text-xs text-slate-500">
+            Continue chatting with the AI to build your case strategy
           </p>
         </div>
       ) : (
