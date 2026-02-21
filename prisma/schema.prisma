@@ -17,15 +17,76 @@ model User {
   firstName String?
   lastName  String?
   imageUrl  String?
+  
+  // Contact & Address (for dispute letters)
+  phone        String?
+  addressLine1 String?
+  addressLine2 String?
+  city         String?
+  postcode     String?
+  
+  // Onboarding
+  onboardingCompleted Boolean @default(false)
+  
+  // Payment Gateway Control (for testing)
+  paymentGatewayEnabled Boolean @default(true) // Admin can disable for specific users
+  
+  // Stripe Subscription
+  stripeCustomerId     String?   @unique
+  subscriptionTier     SubscriptionTier @default(FREE)
+  subscriptionStatus   SubscriptionStatus @default(ACTIVE)
+  subscriptionId       String?   @unique // Stripe subscription ID
+  subscriptionEndsAt   DateTime?
+  
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   disputes Dispute[]
   payments Payment[]
   notifications Notification[]
+  subscription Subscription?
+  pushTokens PushToken[]
+  emailPreferences EmailPreferences?
+  emailAccounts EmailAccount[]
 
   @@index([clerkId])
   @@index([email])
+}
+
+// Subscription enums
+enum SubscriptionTier {
+  FREE
+  PRO
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  CANCELED
+  PAST_DUE
+  TRIALING
+}
+
+// Subscription tracking
+model Subscription {
+  id                   String   @id @default(cuid())
+  userId               String   @unique
+  stripeSubscriptionId String   @unique
+  stripePriceId        String
+  stripeCustomerId     String
+  status               SubscriptionStatus @default(ACTIVE)
+  tier                 SubscriptionTier @default(PRO)
+  currentPeriodStart   DateTime
+  currentPeriodEnd     DateTime
+  cancelAtPeriodEnd    Boolean  @default(false)
+  canceledAt           DateTime?
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([stripeCustomerId])
+  @@index([status])
 }
 
 // Dispute status enum
@@ -41,6 +102,13 @@ enum DisputeStatus {
 enum CaseMode {
   QUICK  // Traditional wizard submission
   GUIDED // Conversational AI-assisted mode
+}
+
+// 3-Tier Document System
+enum DocumentTier {
+  TIER_1_SIMPLE  // Direct resolution: letters, complaints, refund requests
+  TIER_2_ADR     // Pre-action/ADR: LBA, ombudsman, SAR, FOI
+  TIER_3_COURT   // Formal proceedings: ET1, N1, SSCS1
 }
 
 // Conversation status enum - chat state (separate from dispute lifecycle)
@@ -79,6 +147,18 @@ enum RoutingStatus {
   REQUIRES_CLARIFICATION   // Need user input
 }
 
+// FINAL 4-LAYER SYSTEM - Chat State Enum
+// Controls conversation flow and AI behavior
+enum ChatState {
+  GATHERING_FACTS      // System A asking questions
+  WAITING_FOR_UPLOAD   // User needs to upload evidence
+  CONFIRMING_SUMMARY   // 🔒 HARD GATE - blocking UI
+  ROUTING_DECISION     // System C working
+  DOCUMENTS_PREPARING  // System D generating
+  GUIDANCE_ONLY        // Read-only help mode
+  CLOSED               // Case complete
+}
+
 // Dispute model - minimal and extensible
 model Dispute {
   id          String        @id @default(cuid())
@@ -97,8 +177,11 @@ model Dispute {
 
   // Phase 7.1 - Conversational Case AI
   mode                 CaseMode             @default(QUICK)
+  documentTier         DocumentTier         @default(TIER_1_SIMPLE) // 3-tier document system
   conversationStatus   ConversationStatus?  // NULL for QUICK mode cases
   restricted           Boolean              @default(false) // If true, AI disabled, only lawyer escalation allowed
+  flaggedForReview     Boolean              @default(false) // Admin flagged for manual review
+  adminNotes           String?              // Admin notes about this case
 
   // Phase 8.2.2 - Waiting States & Deadline Engine
   lifecycleStatus      CaseLifecycleStatus  @default(DRAFT)
@@ -113,6 +196,12 @@ model Dispute {
   lockReason           String?
   lockedAt             DateTime?
 
+  // FINAL 4-LAYER SYSTEM - Chat State Management
+  chatState            ChatState            @default(GATHERING_FACTS)
+  caseSummary          Json?                // Extracted facts from System B
+  summaryConfirmed     Boolean              @default(false)
+  summaryConfirmedAt   DateTime?
+
   // Relations
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -125,6 +214,10 @@ model Dispute {
   caseEvents        CaseEvent[]
   notifications     Notification[]
   evidenceItems     EvidenceItem[]
+  caseShares        CaseShare[]
+  chatDraft         ChatDraft?
+  emailMessages     EmailMessage[]
+  emailDrafts       EmailDraft[]
 
   @@index([userId])
   @@index([status])
@@ -306,6 +399,8 @@ model GeneratedDocument {
   
   // Block 3C: PDF storage
   fileUrl      String?       // Supabase Storage URL
+  pdfData      Bytes?        // Binary PDF data for auto-filled forms
+  pdfFilename  String?       // Original PDF filename
   retryCount   Int           @default(0)
   lastError    String?       @db.Text
   
@@ -320,6 +415,22 @@ model GeneratedDocument {
   // Legacy field (deprecated - not used in Block 3C)
   content      String?       @db.Text
   
+  // ========================================================================
+  // DELIVERY TRACKING - Track if user has sent the document
+  // ========================================================================
+  
+  // Quick status fields (denormalized for fast queries)
+  deliveryStatus   DeliveryStatus   @default(PENDING)
+  lastSentAt       DateTime?        // Most recent send attempt
+  lastDeliveredAt  DateTime?        // Most recent confirmed delivery
+  sendCount        Int              @default(0) // How many times sent
+  
+  // Analytics tracking
+  viewedAt         DateTime?        // First time user viewed the document
+  viewCount        Int              @default(0) // How many times viewed
+  downloadedAt     DateTime?        // First time user downloaded
+  downloadCount    Int              @default(0) // How many times downloaded
+  
   // Metadata
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
@@ -328,11 +439,73 @@ model GeneratedDocument {
   case         Dispute?      @relation(fields: [caseId], references: [id], onDelete: Cascade)
   plan         DocumentPlan? @relation(fields: [planId], references: [id], onDelete: Cascade)
   events       CaseEvent[]
+  versions     DocumentVersion[]
+  feedback     DocumentFeedback[]
+  deliveries   DocumentDelivery[]
   
   @@index([caseId])
   @@index([planId])
   @@index([status])
   @@index([order]) // For ordered retrieval
+}
+
+// ============================================================================
+// DOCUMENT DELIVERY TRACKING
+// ============================================================================
+
+// How the document was delivered
+enum DeliveryMethod {
+  EMAIL_APP       // Sent via in-app email composer
+  EMAIL_MANUAL    // User copied and sent via their own email
+  POST_RECORDED   // Sent by recorded delivery post
+  POST_STANDARD   // Sent by standard post
+  HAND_DELIVERED  // Delivered in person
+  FAX             // Sent by fax
+  OTHER           // Other method
+}
+
+// Delivery status tracking
+enum DeliveryStatus {
+  PENDING         // Not yet sent
+  SENT            // User marked as sent
+  DELIVERED       // Delivery confirmed
+  FAILED          // Delivery failed
+  RETURNED        // Returned to sender
+}
+
+// Track individual delivery attempts
+model DocumentDelivery {
+  id              String          @id @default(cuid())
+  documentId      String
+  
+  // Delivery details
+  method          DeliveryMethod
+  status          DeliveryStatus  @default(SENT)
+  recipientEmail  String?         // If sent by email
+  recipientName   String?         // Who it was sent to
+  recipientAddress String?        // If sent by post
+  trackingNumber  String?         // For recorded delivery
+  
+  // Timestamps
+  sentAt          DateTime        @default(now())
+  deliveredAt     DateTime?       // When confirmed delivered
+  failedAt        DateTime?       // If delivery failed
+  
+  // User notes
+  notes           String?         @db.Text
+  
+  // Proof of delivery (could be screenshot, tracking confirmation, etc.)
+  proofUrl        String?
+  
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  
+  // Relations
+  document        GeneratedDocument @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  
+  @@index([documentId])
+  @@index([status])
+  @@index([sentAt])
 }
 
 // Enums for document system
@@ -477,3 +650,421 @@ model EvidenceItem {
   @@unique([caseId, evidenceIndex])
 }
 
+// Admin - Blocked IPs for abuse prevention
+model BlockedIP {
+  id          String   @id @default(cuid())
+  ip          String   @unique
+  reason      String
+  blockedBy   String   // Admin email who blocked
+  blockedAt   DateTime @default(now())
+  expiresAt   DateTime? // Optional expiry for temporary blocks
+  
+  @@index([ip])
+  @@index([blockedAt])
+}
+
+// ============================================================================
+// NEW FEATURES - Phase 9
+// ============================================================================
+
+// Push Notification Tokens - Store device tokens for mobile push notifications
+model PushToken {
+  id          String   @id @default(cuid())
+  userId      String
+  token       String   @unique  // Expo push token
+  platform    String   // "ios" | "android"
+  deviceId    String?  // Optional device identifier
+  isActive    Boolean  @default(true)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId])
+  @@index([token])
+  @@index([isActive])
+}
+
+// Document Version History - Track all revisions of generated documents
+model DocumentVersion {
+  id            String   @id @default(cuid())
+  documentId    String
+  versionNumber Int
+  
+  // Content snapshot
+  content       String?  @db.Text
+  fileUrl       String?
+  
+  // Change metadata
+  changeReason  String?
+  changedBy     String?  // User or "system"
+  
+  createdAt     DateTime @default(now())
+  
+  document      GeneratedDocument @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  
+  @@index([documentId])
+  @@index([versionNumber])
+  @@unique([documentId, versionNumber])
+}
+
+// Case Collaboration - Share cases with others
+model CaseShare {
+  id          String   @id @default(cuid())
+  caseId      String
+  
+  // Share settings
+  shareToken  String   @unique @default(cuid())  // Unique link token
+  email       String?  // Invited email (optional)
+  permission  SharePermission @default(VIEW_ONLY)
+  
+  // Access tracking
+  accessedAt  DateTime?
+  accessCount Int      @default(0)
+  
+  // Expiry
+  expiresAt   DateTime?
+  isActive    Boolean  @default(true)
+  
+  createdAt   DateTime @default(now())
+  createdBy   String   // User who created the share
+  
+  case        Dispute  @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  
+  @@index([caseId])
+  @@index([shareToken])
+  @@index([email])
+}
+
+enum SharePermission {
+  VIEW_ONLY      // Can view case and documents
+  COMMENT        // Can view and add comments
+  COLLABORATE    // Can view, comment, and upload evidence
+}
+
+// Document Feedback - User ratings on generated documents
+model DocumentFeedback {
+  id          String   @id @default(cuid())
+  documentId  String
+  userId      String
+  
+  // Feedback
+  rating      Int      // 1-5 stars or thumbs (1 = down, 5 = up)
+  comment     String?  @db.Text
+  
+  // Issue flags
+  hasErrors   Boolean  @default(false)
+  errorTypes  String[] // ["legal_error", "formatting", "missing_info", etc.]
+  
+  createdAt   DateTime @default(now())
+  
+  document    GeneratedDocument @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  
+  @@index([documentId])
+  @@index([userId])
+  @@index([rating])
+  @@unique([documentId, userId])  // One feedback per user per document
+}
+
+// Admin Audit Log - Track all admin actions
+model AdminAuditLog {
+  id          String   @id @default(cuid())
+  adminEmail  String
+  
+  // Action details
+  action      AdminAction
+  targetType  String   // "user", "case", "document", "settings"
+  targetId    String?
+  
+  // Before/after state
+  previousValue Json?
+  newValue      Json?
+  
+  // Context
+  ipAddress   String?
+  userAgent   String?
+  reason      String?
+  
+  createdAt   DateTime @default(now())
+  
+  @@index([adminEmail])
+  @@index([action])
+  @@index([targetType])
+  @@index([createdAt])
+}
+
+enum AdminAction {
+  VIEW_USER
+  EDIT_USER
+  DELETE_USER
+  VIEW_CASE
+  INTERVENE_CASE
+  APPROVE_DOCUMENT
+  REJECT_DOCUMENT
+  BLOCK_USER
+  UNBLOCK_USER
+  CHANGE_SETTINGS
+  EXPORT_DATA
+}
+
+// Chat Draft - Auto-save chat progress
+model ChatDraft {
+  id          String   @id @default(cuid())
+  caseId      String   @unique
+  userId      String
+  
+  // Draft content
+  content     String   @db.Text
+  
+  // Metadata
+  savedAt     DateTime @default(now())
+  
+  case        Dispute  @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  
+  @@index([caseId])
+  @@index([userId])
+}
+
+// Email Notification Preferences
+model EmailPreferences {
+  id                    String   @id @default(cuid())
+  userId                String   @unique
+  
+  // Notification types
+  documentReady         Boolean  @default(true)
+  deadlineReminders     Boolean  @default(true)
+  caseUpdates           Boolean  @default(true)
+  marketingEmails       Boolean  @default(false)
+  weeklyDigest          Boolean  @default(true)
+  
+  // Frequency
+  reminderDaysBefore    Int      @default(3)  // Days before deadline to remind
+  
+  updatedAt             DateTime @updatedAt
+  
+  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// Legal Glossary Terms - For inline explanations
+model GlossaryTerm {
+  id          String   @id @default(cuid())
+  term        String   @unique
+  definition  String   @db.Text
+  category    String?  // "court", "contract", "employment", etc.
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([term])
+  @@index([category])
+}
+
+// Sponsored Legal Services - Ad placements
+// Displayed in the "Top Legal Services" carousel on mobile home screen
+model SponsoredLegalService {
+  id          String   @id @default(cuid())
+  
+  // Service details
+  name        String
+  description String   @db.Text
+  url         String   // Link to the service
+  icon        String?  // Ionicons icon name (e.g., "briefcase", "cash")
+  
+  // Sponsor info
+  sponsorName   String
+  sponsorEmail  String
+  
+  // Display settings
+  displayOrder  Int      @default(0)  // Lower = higher priority
+  isActive      Boolean  @default(true)
+  
+  // Campaign dates
+  startDate     DateTime?
+  endDate       DateTime?
+  
+  // Billing
+  billingType   AdBillingType @default(FLAT_RATE)
+  pricePerMonth Decimal?     @db.Decimal(10, 2)
+  impressions   Int          @default(0)  // Track views
+  clicks        Int          @default(0)  // Track clicks
+  
+  // Metadata
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  createdBy   String?  // Admin who added
+  
+  @@index([isActive])
+  @@index([displayOrder])
+  @@index([startDate, endDate])
+}
+
+// Billing type for sponsored ads
+enum AdBillingType {
+  FLAT_RATE    // Fixed monthly fee
+  PER_CLICK    // Pay per click (CPC)
+  PER_IMPRESSION // Pay per 1000 impressions (CPM)
+}
+
+// ============================================================================
+// EMAIL SYSTEM - OAuth Email Sending & Reading
+// ============================================================================
+
+// Email provider enum
+enum EmailProvider {
+  GMAIL
+  OUTLOOK
+}
+
+// Email direction
+enum EmailDirection {
+  OUTBOUND   // Sent by user
+  INBOUND    // Received
+}
+
+// Draft status
+enum EmailDraftStatus {
+  DRAFT       // AI generated, awaiting approval
+  APPROVED    // User approved, ready to send
+  SENT        // Successfully sent
+  FAILED      // Send failed
+  CANCELLED   // User cancelled
+}
+
+// Email type enum for AI drafts
+enum EmailType {
+  LBA                     // Letter Before Action
+  FOLLOW_UP               // Follow-up to previous correspondence
+  RESPONSE                // Response to received email
+  TRIBUNAL_SUBMISSION     // Tribunal/court submission
+  EVIDENCE_REQUEST        // Request for evidence/documents
+  SETTLEMENT_OFFER        // Settlement/negotiation
+  COMPLAINT               // Formal complaint
+  OTHER                   // General correspondence
+}
+
+// Connected email accounts (OAuth tokens stored encrypted)
+model EmailAccount {
+  id              String        @id @default(cuid())
+  userId          String
+  provider        EmailProvider
+  email           String        // The connected email address
+  
+  // Encrypted OAuth tokens (AES-256-GCM)
+  accessTokenEnc  String        @db.Text
+  refreshTokenEnc String?       @db.Text
+  tokenExpiresAt  DateTime?
+  scopes          String[]      // Granted OAuth scopes
+  
+  // Sync state
+  syncCursor      String?       // Gmail historyId or Outlook deltaLink
+  lastSyncAt      DateTime?
+  
+  // Status
+  isActive        Boolean       @default(true)
+  disconnectedAt  DateTime?
+  
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  
+  // Relations
+  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  emailMessages   EmailMessage[]
+  emailDrafts     EmailDraft[]
+  
+  @@unique([userId, provider])
+  @@index([userId])
+  @@index([provider])
+  @@index([email])
+}
+
+// Stored email messages (sent + received)
+model EmailMessage {
+  id                String          @id @default(cuid())
+  emailAccountId    String
+  disputeId         String?         // Matched to a case (nullable)
+  
+  // External IDs
+  externalMessageId String?         // Gmail/Outlook message ID
+  threadId          String?         // Gmail thread ID / Outlook conversation ID
+  
+  // Direction
+  direction         EmailDirection
+  
+  // Addresses
+  senderEmail       String
+  senderName        String?
+  recipientEmail    String
+  recipientName     String?
+  
+  // Content
+  subject           String
+  bodyText          String?         @db.Text   // Plain text body
+  bodyHtml          String?         @db.Text   // HTML body
+  snippet           String?         // Short preview text
+  
+  // AI Analysis (JSON)
+  aiAnalysis        Json?           // { intent, sentiment, keyPoints, suggestedAction, confidence }
+  
+  // Metadata
+  receivedAt        DateTime
+  isRead            Boolean         @default(false)
+  hasAttachments    Boolean         @default(false)
+  
+  createdAt         DateTime        @default(now())
+  
+  // Relations
+  emailAccount      EmailAccount    @relation(fields: [emailAccountId], references: [id], onDelete: Cascade)
+  dispute           Dispute?        @relation(fields: [disputeId], references: [id], onDelete: SetNull)
+  replies           EmailDraft[]    @relation("ReplyTo")
+  
+  @@index([emailAccountId])
+  @@index([disputeId])
+  @@index([threadId])
+  @@index([direction])
+  @@index([receivedAt])
+  @@index([senderEmail])
+}
+
+// AI-generated email drafts awaiting user approval
+model EmailDraft {
+  id                String           @id @default(cuid())
+  disputeId         String
+  userId            String
+  emailAccountId    String?          // Which account to send from
+  
+  // Reply context
+  inReplyToId       String?          // EmailMessage this is replying to
+  
+  // Email content
+  recipientEmail    String
+  recipientName     String?
+  subject           String
+  body              String           @db.Text
+  bodyHtml          String?          @db.Text
+  
+  // Classification
+  emailType         EmailType
+  
+  // Status
+  status            EmailDraftStatus @default(DRAFT)
+  sentAt            DateTime?
+  externalMessageId String?          // Populated after sending
+  
+  // Error tracking
+  lastError         String?          @db.Text
+  retryCount        Int              @default(0)
+  
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+  
+  // Relations
+  dispute           Dispute          @relation(fields: [disputeId], references: [id], onDelete: Cascade)
+  emailAccount      EmailAccount?    @relation(fields: [emailAccountId], references: [id], onDelete: SetNull)
+  inReplyTo         EmailMessage?    @relation("ReplyTo", fields: [inReplyToId], references: [id], onDelete: SetNull)
+  
+  @@index([disputeId])
+  @@index([userId])
+  @@index([status])
+  @@index([emailType])
+}

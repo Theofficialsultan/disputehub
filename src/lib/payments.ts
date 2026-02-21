@@ -5,11 +5,31 @@ import { prisma } from "@/lib/prisma";
  * This is the SINGLE SOURCE OF TRUTH for unlock status
  * 
  * DEV ONLY: Set BYPASS_PAYWALL=true in .env to bypass payment check
+ * ADMIN: If user has paymentGatewayEnabled=false, bypass payment
  */
 export async function isDisputeUnlocked(disputeId: string): Promise<boolean> {
   // DEV ONLY: Bypass paywall for testing
   if (process.env.BYPASS_PAYWALL === "true") {
     console.log("⚠️  PAYWALL BYPASSED (dev mode) for dispute:", disputeId);
+    return true;
+  }
+
+  // Get the dispute with user info
+  const dispute = await prisma.dispute.findUnique({
+    where: { id: disputeId },
+    select: {
+      userId: true,
+      user: {
+        select: {
+          paymentGatewayEnabled: true,
+        },
+      },
+    },
+  });
+
+  // ADMIN BYPASS: If payment gateway is disabled for this user, bypass paywall
+  if (dispute?.user?.paymentGatewayEnabled === false) {
+    console.log("💳 Payment gateway disabled for user - bypassing paywall for dispute:", disputeId);
     return true;
   }
 
