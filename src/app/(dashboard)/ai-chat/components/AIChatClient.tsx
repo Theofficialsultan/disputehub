@@ -15,12 +15,12 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import type { CaseLifecycleStatus, DisputeType } from "@prisma/client";
+import type { CaseLifecycleStatus } from "@prisma/client";
 
 interface Dispute {
   id: string;
   title: string;
-  type: DisputeType;
+  type: string;
   lifecycleStatus: CaseLifecycleStatus;
   waitingUntil: Date | null;
   strategyLocked: boolean;
@@ -99,9 +99,9 @@ function SuggestionBox({
   return (
     <button
       onClick={onClick}
-      className="group relative overflow-hidden rounded-2xl p-6 glass-strong border border-indigo-500/20 hover:border-indigo-500/50 transition-all duration-300 text-left hover:scale-105 hover:glow-purple"
+      className="group relative overflow-hidden rounded-2xl p-6 bg-white/90 backdrop-blur-xl border border-slate-200/60 hover:border-slate-300 transition-all duration-300 text-left hover:scale-105 shadow-sm hover:shadow-md"
     >
-      <div className={`absolute inset-0 bg-gradient-to-br ${gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-300`} />
+      <div className={`absolute inset-0 bg-gradient-to-br ${gradient} opacity-0 group-hover:opacity-5 transition-opacity duration-300`} />
       
       <div className="relative z-10 space-y-3">
         <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${gradient} flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300`}>
@@ -109,15 +109,15 @@ function SuggestionBox({
         </div>
         
         <div>
-          <h3 className="font-semibold text-white text-lg mb-1 group-hover:text-indigo-300 transition-colors">
+          <h3 className="font-semibold text-slate-900 text-lg mb-1 group-hover:text-blue-600 transition-colors">
             {title}
           </h3>
-          <p className="text-sm text-slate-400 group-hover:text-slate-300 transition-colors">
+          <p className="text-sm text-slate-500 group-hover:text-slate-600 transition-colors">
             {description}
           </p>
         </div>
 
-        <div className="flex items-center gap-2 text-indigo-400 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-0 group-hover:translate-x-2">
+        <div className="flex items-center gap-2 text-blue-600 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-0 group-hover:translate-x-2">
           <span className="text-sm font-medium">Start conversation</span>
           <ArrowRight className="h-4 w-4" />
         </div>
@@ -129,24 +129,18 @@ function SuggestionBox({
 function ChatMessage({ message }: { message: Message }) {
   return (
     <div className={`flex gap-4 ${message.role === "user" ? "flex-row-reverse" : ""}`}>
-      <div
-        className={`w-10 h-10 rounded-xl flex items-center justify-center text-white font-semibold shrink-0 ${
-          message.role === "assistant"
-            ? "bg-gradient-to-br from-indigo-500 to-purple-500"
-            : "bg-gradient-to-br from-cyan-500 to-blue-500"
-        }`}
-      >
+      <div className="w-10 h-10 rounded-xl bg-blue-600 shadow-sm flex items-center justify-center text-white font-semibold shrink-0">
         {message.role === "assistant" ? <Sparkles className="h-5 w-5" /> : "You"}
       </div>
       <div className={`flex-1 ${message.role === "user" ? "text-right" : ""}`}>
         <div
-          className={`inline-block p-4 rounded-2xl max-w-[80%] ${
+          className={`inline-block p-4 max-w-[80%] ${
             message.role === "assistant"
-              ? "bg-indigo-500/10 border border-indigo-500/20"
-              : "bg-cyan-500/10 border border-cyan-500/20"
+              ? "bg-white text-slate-800 rounded-2xl rounded-tl-md border border-slate-200 shadow-sm"
+              : "bg-blue-600 text-white rounded-2xl rounded-tr-md shadow-sm"
           }`}
         >
-          <p className="text-white text-sm leading-relaxed">{message.content}</p>
+          <p className="text-sm leading-relaxed">{message.content}</p>
         </div>
         <p className="text-xs text-slate-500 mt-1">
           {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
@@ -278,26 +272,26 @@ export default function AIChatClient({ disputes, userName }: AIChatClientProps) 
   };
 
   return (
-    <div className="min-h-[calc(100vh-8rem)] flex flex-col">
+    <div className="min-h-[calc(100vh-4rem)] lg:min-h-[calc(100vh-8rem)] -mt-16 pt-2 lg:mt-0 lg:pt-0 flex flex-col bg-gradient-to-br from-[#f8faff] via-[#eef2ff] to-[#e0e7ff] px-4 sm:px-0">
       {/* Show suggestions only when no messages */}
       {messages.length === 0 ? (
-        <div className="flex-1 flex flex-col items-center justify-center space-y-12 py-12">
+        <div className="flex-1 flex flex-col items-center justify-center space-y-8 sm:space-y-12 py-6 sm:py-12">
           {/* Animated Orb */}
-          <div className="relative">
+          <div className="relative scale-75 sm:scale-100">
             <AnimatedOrb />
-            <div className="text-center mt-8">
-              <h1 className="text-4xl font-bold text-white mb-3 bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-400 bg-clip-text text-transparent">
+            <div className="text-center mt-6 sm:mt-8">
+              <h1 className="text-2xl sm:text-4xl font-bold text-slate-900 mb-2 sm:mb-3">
                 AI Legal Assistant
               </h1>
-              <p className="text-slate-400 text-lg">
+              <p className="text-slate-500 text-base sm:text-lg">
                 How can I help you today, {userName}?
               </p>
             </div>
           </div>
 
           {/* Suggestion Boxes */}
-          <div className="w-full max-w-5xl px-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="w-full max-w-5xl px-0 sm:px-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {suggestions.slice(0, 3).map((suggestion, index) => (
                 <SuggestionBox
                   key={index}
@@ -335,15 +329,15 @@ export default function AIChatClient({ disputes, userName }: AIChatClientProps) 
           ))}
           {isLoading && (
             <div className="flex gap-4">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-xl bg-blue-600 shadow-sm flex items-center justify-center">
                 <Sparkles className="h-5 w-5 text-white animate-pulse" />
               </div>
               <div className="flex-1">
-                <div className="inline-block p-4 rounded-2xl bg-indigo-500/10 border border-indigo-500/20">
+                <div className="inline-block p-4 rounded-2xl rounded-tl-md bg-white border border-slate-200 shadow-sm">
                   <div className="flex gap-2">
-                    <div className="w-2 h-2 bg-indigo-400 rounded-full animate-bounce" style={{ animationDelay: "0s" }} />
-                    <div className="w-2 h-2 bg-indigo-400 rounded-full animate-bounce" style={{ animationDelay: "0.2s" }} />
-                    <div className="w-2 h-2 bg-indigo-400 rounded-full animate-bounce" style={{ animationDelay: "0.4s" }} />
+                    <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: "0s" }} />
+                    <div className="w-2 h-2 bg-blue-300 rounded-full animate-bounce" style={{ animationDelay: "0.2s" }} />
+                    <div className="w-2 h-2 bg-blue-200 rounded-full animate-bounce" style={{ animationDelay: "0.4s" }} />
                   </div>
                 </div>
               </div>
@@ -354,14 +348,15 @@ export default function AIChatClient({ disputes, userName }: AIChatClientProps) 
       )}
 
       {/* Input Area - Always visible */}
-      <div className="sticky bottom-0 bg-gradient-to-t from-slate-950 via-slate-950/95 to-transparent pt-6 pb-8 px-4">
+      <div className="sticky bottom-0 bg-white/95 backdrop-blur-xl border-t border-slate-200/60 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] lg:pb-4 px-4">
         <div className="max-w-4xl mx-auto">
-          <form onSubmit={handleSubmit} className="relative">
+          <form onSubmit={handleSubmit} className="relative flex items-end gap-2">
             <Textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Ask, write or search for anything..."
-              className="glass-strong border-indigo-500/20 text-white placeholder:text-slate-500 resize-none pr-14 min-h-[80px] focus:border-indigo-500/50 rounded-2xl"
+              placeholder="Ask anything about your legal rights..."
+              className="bg-white border border-slate-200 text-slate-900 placeholder:text-slate-500 resize-none pr-14 min-h-[52px] sm:min-h-[80px] focus:border-slate-400 rounded-2xl text-base"
+              rows={1}
               onKeyDown={(e) => {
                 if (e.key === "Enter" && !e.shiftKey) {
                   e.preventDefault();
@@ -373,12 +368,12 @@ export default function AIChatClient({ disputes, userName }: AIChatClientProps) 
               type="submit"
               disabled={!input.trim() || isLoading}
               size="icon"
-              className="absolute right-3 bottom-3 h-10 w-10 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white border-0 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="absolute right-3 bottom-3 h-10 w-10 rounded-xl bg-blue-600 hover:bg-blue-700 text-white border-0 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Send className="h-5 w-5" />
             </Button>
           </form>
-          <p className="text-xs text-slate-500 text-center mt-3">
+          <p className="text-xs text-slate-500 text-center mt-2 hidden sm:block">
             Press Enter to send • Shift + Enter for new line
           </p>
         </div>
