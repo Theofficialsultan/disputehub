@@ -19,6 +19,11 @@ async function SettingsData() {
       firstName: true,
       lastName: true,
       imageUrl: true,
+      phone: true,
+      addressLine1: true,
+      addressLine2: true,
+      city: true,
+      postcode: true,
       createdAt: true,
     },
   });
@@ -67,8 +72,8 @@ export default function SettingsPage() {
       fallback={
         <div className="flex h-[50vh] items-center justify-center">
           <div className="text-center">
-            <div className="mb-4 inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-indigo-500 border-r-transparent" />
-            <p className="text-sm text-slate-400">Loading settings...</p>
+            <div className="mb-4 inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-blue-600 border-r-transparent" />
+            <p className="text-sm text-slate-500">Loading settings...</p>
           </div>
         </div>
       }

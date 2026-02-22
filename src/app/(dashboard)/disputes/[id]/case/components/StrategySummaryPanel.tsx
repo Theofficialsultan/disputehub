@@ -44,8 +44,8 @@ export function StrategySummaryPanel({
   // If no strategy exists at all, show a minimal message
   if (!strategy) {
     return (
-      <div className="mx-auto mb-4 max-w-3xl rounded-lg border bg-muted/50 p-4">
-        <p className="text-center text-sm text-muted-foreground">
+      <div className="mx-auto mb-4 max-w-3xl rounded-xl border border-slate-200 bg-slate-50 p-4">
+        <p className="text-center text-sm text-slate-500">
           We're learning about your case as we chat. Information will appear here as you share details.
         </p>
       </div>
@@ -61,8 +61,8 @@ export function StrategySummaryPanel({
   // If strategy exists but has no data yet
   if (!hasAnyData) {
     return (
-      <div className="mx-auto mb-4 max-w-3xl rounded-lg border bg-muted/50 p-4">
-        <p className="text-center text-sm text-muted-foreground">
+      <div className="mx-auto mb-4 max-w-3xl rounded-xl border border-slate-200 bg-slate-50 p-4">
+        <p className="text-center text-sm text-slate-500">
           We're learning about your case as we chat. Information will appear here as you share details.
         </p>
       </div>
@@ -70,18 +70,18 @@ export function StrategySummaryPanel({
   }
 
   return (
-    <div className="mx-auto mb-4 max-w-3xl rounded-lg border bg-background shadow-sm">
+    <div className="mx-auto mb-4 max-w-3xl rounded-xl border border-slate-200 bg-white shadow-sm">
       {/* Header (Always Visible) */}
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        className="flex w-full items-center justify-between p-4 text-left transition-colors hover:bg-muted/50"
+        className="flex w-full items-center justify-between p-4 text-left transition-colors hover:bg-slate-50"
         aria-expanded={isExpanded}
         aria-controls="strategy-content"
       >
         <div className="flex items-center gap-2">
-          <FileText className="h-5 w-5 text-primary" />
-          <h2 className="font-semibold">What we know so far</h2>
-          <Badge variant="secondary" className="text-xs">
+          <FileText className="h-5 w-5 text-blue-600" />
+          <h2 className="font-semibold text-slate-900">What we know so far</h2>
+          <Badge variant="secondary" className="text-xs bg-slate-100 text-slate-700 border-slate-200">
             {[
               strategy.disputeType ? 1 : 0,
               strategy.keyFacts.length,
@@ -92,9 +92,9 @@ export function StrategySummaryPanel({
           </Badge>
         </div>
         {isExpanded ? (
-          <ChevronUp className="h-5 w-5 text-muted-foreground" />
+          <ChevronUp className="h-5 w-5 text-slate-500" />
         ) : (
-          <ChevronDown className="h-5 w-5 text-muted-foreground" />
+          <ChevronDown className="h-5 w-5 text-slate-500" />
         )}
       </button>
 
@@ -102,15 +102,15 @@ export function StrategySummaryPanel({
       {isExpanded && (
         <div
           id="strategy-content"
-          className="border-t px-4 pb-4 pt-3 space-y-4"
+          className="border-t border-slate-200 px-4 pb-4 pt-3 space-y-4"
         >
           {/* Dispute Type */}
           <div>
             <div className="mb-2 flex items-center gap-2">
-              <Gavel className="h-4 w-4 text-muted-foreground" />
-              <h3 className="text-sm font-medium">Dispute Type</h3>
+              <Gavel className="h-4 w-4 text-slate-500" />
+              <h3 className="text-sm font-medium text-slate-900">Dispute Type</h3>
             </div>
-            <p className="text-sm text-muted-foreground pl-6">
+            <p className="text-sm text-slate-600 pl-6">
               {humanizeDisputeType(strategy.disputeType)}
             </p>
           </div>
@@ -118,22 +118,22 @@ export function StrategySummaryPanel({
           {/* Key Facts */}
           <div>
             <div className="mb-2 flex items-center gap-2">
-              <FileText className="h-4 w-4 text-muted-foreground" />
-              <h3 className="text-sm font-medium">Key Facts</h3>
+              <FileText className="h-4 w-4 text-slate-500" />
+              <h3 className="text-sm font-medium text-slate-900">Key Facts</h3>
             </div>
             {strategy.keyFacts.length > 0 ? (
               <ul className="space-y-1 pl-6">
                 {strategy.keyFacts.map((fact, index) => (
                   <li
                     key={index}
-                    className="text-sm text-muted-foreground list-disc"
+                    className="text-sm text-slate-600 list-disc"
                   >
                     {fact}
                   </li>
                 ))}
               </ul>
             ) : (
-              <p className="text-sm text-muted-foreground/60 pl-6 italic">
+              <p className="text-sm text-slate-500 pl-6 italic">
                 No key facts recorded yet
               </p>
             )}
@@ -142,22 +142,22 @@ export function StrategySummaryPanel({
           {/* Evidence Mentioned */}
           <div>
             <div className="mb-2 flex items-center gap-2">
-              <Image className="h-4 w-4 text-muted-foreground" />
-              <h3 className="text-sm font-medium">Evidence Mentioned</h3>
+              <Image className="h-4 w-4 text-slate-500" />
+              <h3 className="text-sm font-medium text-slate-900">Evidence Mentioned</h3>
             </div>
             {strategy.evidenceMentioned.length > 0 ? (
               <ul className="space-y-1 pl-6">
                 {strategy.evidenceMentioned.map((evidence, index) => (
                   <li
                     key={index}
-                    className="text-sm text-muted-foreground list-disc"
+                    className="text-sm text-slate-600 list-disc"
                   >
                     {evidence}
                   </li>
                 ))}
               </ul>
             ) : (
-              <p className="text-sm text-muted-foreground/60 pl-6 italic">
+              <p className="text-sm text-slate-500 pl-6 italic">
                 No evidence mentioned yet
               </p>
             )}
@@ -166,14 +166,14 @@ export function StrategySummaryPanel({
           {/* Desired Outcome */}
           <div>
             <div className="mb-2 flex items-center gap-2">
-              <Target className="h-4 w-4 text-muted-foreground" />
-              <h3 className="text-sm font-medium">Desired Outcome</h3>
+              <Target className="h-4 w-4 text-slate-500" />
+              <h3 className="text-sm font-medium text-slate-900">Desired Outcome</h3>
             </div>
             <p
               className={`text-sm pl-6 ${
                 strategy.desiredOutcome
-                  ? "text-muted-foreground"
-                  : "text-muted-foreground/60 italic"
+                  ? "text-slate-600"
+                  : "text-slate-500 italic"
               }`}
             >
               {strategy.desiredOutcome || "Not specified yet"}

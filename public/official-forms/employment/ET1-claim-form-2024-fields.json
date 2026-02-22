@@ -1,0 +1,452 @@
+[
+  {
+    "name": "tribunal office",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "case number",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "date received",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "13 R4 name",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "13 R4 number",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "13 R4 postcode",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "13 R4 Do you have an Acas early conciliation certificate number? Yes",
+    "type": "PDFCheckBox",
+    "value": "unchecked"
+  },
+  {
+    "name": "13 R4 Do you have an Acas early conciliation certificate number? No",
+    "type": "PDFCheckBox",
+    "value": "unchecked"
+  },
+  {
+    "name": "13 R4 please give the Acas early conciliation certificate number",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "13 R4 why don't you have an Acas early conciliation certificate number? Another person I'm making the claim with has an Acas early conciliation certificate number",
+    "type": "PDFCheckBox",
+    "value": "unchecked"
+  },
+  {
+    "name": "13 R4 why don't you have an Acas early conciliation certificate number? Acas doesn’t have the power to conciliate on some or all of my claim",
+    "type": "PDFCheckBox",
+    "value": "unchecked"
+  },
+  {
+    "name": "13 R4 why don't you have an Acas early conciliation certificate number? My employer has already been in touch with Acas",
+    "type": "PDFCheckBox",
+    "value": "unchecked"
+  },
+  {
+    "name": "13 R5 name",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "13 R5 number",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "13 R5 postcode",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "13 R5 Do you have an Acas early conciliation certificate number? Yes",
+    "type": "PDFCheckBox",
+    "value": "unchecked"
+  },
+  {
+    "name": "13 R5 Do you have an Acas early conciliation certificate number? No",
+    "type": "PDFCheckBox",
+    "value": "unchecked"
+  },
+  {
+    "name": "13 R5 please give the Acas early conciliation certificate number",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "13 R5 why don't you have an Acas early conciliation certificate number? Another person I'm making the claim with has an Acas early conciliation certificate number",
+    "type": "PDFCheckBox",
+    "value": "unchecked"
+  },
+  {
+    "name": "13 R5 why don't you have an Acas early conciliation certificate number? Acas doesn’t have the power to conciliate on some or all of my claim",
+    "type": "PDFCheckBox",
+    "value": "unchecked"
+  },
+  {
+    "name": "13 R5 why don't you have an Acas early conciliation certificate number? My employer has already been in touch with Acas",
+    "type": "PDFCheckBox",
+    "value": "unchecked"
+  },
+  {
+    "name": "15 Additional information",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "claim type a unfair dismissal or constructive dismissal",
+    "type": "PDFCheckBox",
+    "value": "unchecked"
+  },
+  {
+    "name": "claim type b discrimination",
+    "type": "PDFCheckBox",
+    "value": "unchecked"
+  },
+  {
+    "name": "claim type c redundancy payment",
+    "type": "PDFCheckBox",
+    "value": "unchecked"
+  },
+  {
+    "name": "claim type d other payments you are owed",
+    "type": "PDFCheckBox",
+    "value": "unchecked"
+  },
+  {
+    "name": "claim type e other complaints",
+    "type": "PDFCheckBox",
+    "value": "unchecked"
+  },
+  {
+    "name": "sex a",
+    "type": "PDFCheckBox",
+    "value": "unchecked"
+  },
+  {
+    "name": "sex b",
+    "type": "PDFCheckBox",
+    "value": "unchecked"
+  },
+  {
+    "name": "sex c",
+    "type": "PDFCheckBox",
+    "value": "unchecked"
+  },
+  {
+    "name": "age group a",
+    "type": "PDFCheckBox",
+    "value": "unchecked"
+  },
+  {
+    "name": "age group b",
+    "type": "PDFCheckBox",
+    "value": "unchecked"
+  },
+  {
+    "name": "age group c",
+    "type": "PDFCheckBox",
+    "value": "unchecked"
+  },
+  {
+    "name": "age group d",
+    "type": "PDFCheckBox",
+    "value": "unchecked"
+  },
+  {
+    "name": "age group e",
+    "type": "PDFCheckBox",
+    "value": "unchecked"
+  },
+  {
+    "name": "age group f",
+    "type": "PDFCheckBox",
+    "value": "unchecked"
+  },
+  {
+    "name": "age group g",
+    "type": "PDFCheckBox",
+    "value": "unchecked"
+  },
+  {
+    "name": "ethnicity a White English / Welsh / Scottish / Northern Irish / British",
+    "type": "PDFCheckBox",
+    "value": "unchecked"
+  },
+  {
+    "name": "ethnicity b White Irish",
+    "type": "PDFCheckBox",
+    "value": "unchecked"
+  },
+  {
+    "name": "ethnicity c White Gypsy or Irish Traveller",
+    "type": "PDFCheckBox",
+    "value": "unchecked"
+  },
+  {
+    "name": "ethnicity d White other",
+    "type": "PDFCheckBox",
+    "value": "unchecked"
+  },
+  {
+    "name": "Mixed / multiple ethnic groups e White and Black Caribbean",
+    "type": "PDFCheckBox",
+    "value": "unchecked"
+  },
+  {
+    "name": "Mixed / multiple ethnic groups f White and Black African",
+    "type": "PDFCheckBox",
+    "value": "unchecked"
+  },
+  {
+    "name": "Mixed / multiple ethnic groups g White and Asian",
+    "type": "PDFCheckBox",
+    "value": "unchecked"
+  },
+  {
+    "name": "Mixed / multiple ethnic groups h other",
+    "type": "PDFCheckBox",
+    "value": "unchecked"
+  },
+  {
+    "name": "Asian / Asian British i Indian",
+    "type": "PDFCheckBox",
+    "value": "unchecked"
+  },
+  {
+    "name": "Asian / Asian British j Pakistani",
+    "type": "PDFCheckBox",
+    "value": "unchecked"
+  },
+  {
+    "name": "Asian / Asian British k Bangladeshi",
+    "type": "PDFCheckBox",
+    "value": "unchecked"
+  },
+  {
+    "name": "Asian / Asian British l Chinese",
+    "type": "PDFCheckBox",
+    "value": "unchecked"
+  },
+  {
+    "name": "Asian / Asian British m other",
+    "type": "PDFCheckBox",
+    "value": "unchecked"
+  },
+  {
+    "name": "Black / African / Caribbean / Black British n African",
+    "type": "PDFCheckBox",
+    "value": "unchecked"
+  },
+  {
+    "name": "Black / African / Caribbean / Black British o Caribbean",
+    "type": "PDFCheckBox",
+    "value": "unchecked"
+  },
+  {
+    "name": "Black / African / Caribbean / Black British p other",
+    "type": "PDFCheckBox",
+    "value": "unchecked"
+  },
+  {
+    "name": "other ethnic group q Arab",
+    "type": "PDFCheckBox",
+    "value": "unchecked"
+  },
+  {
+    "name": "other ethnic group r other",
+    "type": "PDFCheckBox",
+    "value": "unchecked"
+  },
+  {
+    "name": "Ethnicity s prefer not to say",
+    "type": "PDFCheckBox",
+    "value": "unchecked"
+  },
+  {
+    "name": "disability (a)",
+    "type": "PDFCheckBox",
+    "value": "unchecked"
+  },
+  {
+    "name": "disability (b)",
+    "type": "PDFCheckBox",
+    "value": "unchecked"
+  },
+  {
+    "name": "disability (c)",
+    "type": "PDFCheckBox",
+    "value": "unchecked"
+  },
+  {
+    "name": "marriage (a)",
+    "type": "PDFCheckBox",
+    "value": "unchecked"
+  },
+  {
+    "name": "marriage (b)",
+    "type": "PDFCheckBox",
+    "value": "unchecked"
+  },
+  {
+    "name": "marriage (c)",
+    "type": "PDFCheckBox",
+    "value": "unchecked"
+  },
+  {
+    "name": "marriage (d)",
+    "type": "PDFCheckBox",
+    "value": "unchecked"
+  },
+  {
+    "name": "marriage (e)",
+    "type": "PDFCheckBox",
+    "value": "unchecked"
+  },
+  {
+    "name": "marriage (f)",
+    "type": "PDFCheckBox",
+    "value": "unchecked"
+  },
+  {
+    "name": "marriage (g)",
+    "type": "PDFCheckBox",
+    "value": "unchecked"
+  },
+  {
+    "name": "marriage (h)",
+    "type": "PDFCheckBox",
+    "value": "unchecked"
+  },
+  {
+    "name": "marriage (i)",
+    "type": "PDFCheckBox",
+    "value": "unchecked"
+  },
+  {
+    "name": "marriage (j)",
+    "type": "PDFCheckBox",
+    "value": "unchecked"
+  },
+  {
+    "name": "religion (a)",
+    "type": "PDFCheckBox",
+    "value": "unchecked"
+  },
+  {
+    "name": "religion (b)",
+    "type": "PDFCheckBox",
+    "value": "unchecked"
+  },
+  {
+    "name": "religion (c)",
+    "type": "PDFCheckBox",
+    "value": "unchecked"
+  },
+  {
+    "name": "religion (d)",
+    "type": "PDFCheckBox",
+    "value": "unchecked"
+  },
+  {
+    "name": "religion (e)",
+    "type": "PDFCheckBox",
+    "value": "unchecked"
+  },
+  {
+    "name": "religion (f)",
+    "type": "PDFCheckBox",
+    "value": "unchecked"
+  },
+  {
+    "name": "religion (g)",
+    "type": "PDFCheckBox",
+    "value": "unchecked"
+  },
+  {
+    "name": "religion (h)",
+    "type": "PDFCheckBox",
+    "value": "unchecked"
+  },
+  {
+    "name": "other religion",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "religion (i)",
+    "type": "PDFCheckBox",
+    "value": "unchecked"
+  },
+  {
+    "name": "caring (a)",
+    "type": "PDFCheckBox",
+    "value": "unchecked"
+  },
+  {
+    "name": "caring (b)",
+    "type": "PDFCheckBox",
+    "value": "unchecked"
+  },
+  {
+    "name": "caring (c)",
+    "type": "PDFCheckBox",
+    "value": "unchecked"
+  },
+  {
+    "name": "sexual identity (a)",
+    "type": "PDFCheckBox",
+    "value": "unchecked"
+  },
+  {
+    "name": "sexual identity (b)",
+    "type": "PDFCheckBox",
+    "value": "unchecked"
+  },
+  {
+    "name": "sexual identity (c)",
+    "type": "PDFCheckBox",
+    "value": "unchecked"
+  },
+  {
+    "name": "sexual identity (d)",
+    "type": "PDFCheckBox",
+    "value": "unchecked"
+  },
+  {
+    "name": "sexual identity (e)",
+    "type": "PDFCheckBox",
+    "value": "unchecked"
+  },
+  {
+    "name": "pregnancy (a)",
+    "type": "PDFCheckBox",
+    "value": "unchecked"
+  },
+  {
+    "name": "pregnancy (b)",
+    "type": "PDFCheckBox",
+    "value": "unchecked"
+  },
+  {
+    "name": "pregnancy (c)",
+    "type": "PDFCheckBox",
+    "value": "unchecked"
+  }
+]

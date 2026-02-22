@@ -11,7 +11,6 @@ async function LawyerData() {
     redirect("/login");
   }
 
-  // Get user's disputes for lawyer assignment
   const disputes = await prisma.dispute.findMany({
     where: { userId },
     select: {
@@ -20,8 +19,17 @@ async function LawyerData() {
       type: true,
       lifecycleStatus: true,
       createdAt: true,
+      updatedAt: true,
+      description: true,
+      caseStrategy: {
+        select: {
+          disputeType: true,
+          desiredOutcome: true,
+        },
+      },
       documentPlan: {
         select: {
+          complexity: true,
           documents: {
             select: {
               status: true,
@@ -30,10 +38,10 @@ async function LawyerData() {
         },
       },
     },
-    orderBy: { createdAt: "desc" },
+    orderBy: { updatedAt: "desc" },
   });
 
-  return <LawyerClient disputes={disputes} />;
+  return <LawyerClient disputes={disputes as any} />;
 }
 
 export default function LawyerPage() {
@@ -42,8 +50,8 @@ export default function LawyerPage() {
       fallback={
         <div className="flex h-[50vh] items-center justify-center">
           <div className="text-center">
-            <div className="mb-4 inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-indigo-500 border-r-transparent" />
-            <p className="text-sm text-slate-400">Loading...</p>
+            <div className="mb-4 inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-blue-600 border-r-transparent" />
+            <p className="text-sm text-slate-500">Loading...</p>
           </div>
         </div>
       }

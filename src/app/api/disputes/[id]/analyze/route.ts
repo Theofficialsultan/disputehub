@@ -48,7 +48,7 @@ export async function POST(
     const updatedDispute = await prisma.dispute.update({
       where: { id },
       data: {
-        aiPreview: preview,
+        aiPreview: preview as any,
         strengthScore: preview.strength,
       },
     });

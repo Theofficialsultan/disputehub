@@ -104,14 +104,156 @@ export function DocumentStatus({ caseId }: DocumentStatusProps) {
     }
   };
 
-  // Convert plain text content to formatted HTML
+  // Convert plain text content to professional legal HTML
   const convertToHTML = (doc: Document) => {
-    const content = doc.content
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/\n\n/g, '</p><p>')
-      .replace(/\n/g, '<br/>');
+    const lines = doc.content.split('\n');
+    const htmlParts: string[] = [];
+    let inList = false;
+    let listType: 'ol' | 'ul' | null = null;
+    let currentParagraph: string[] = [];
+    
+    const escapeHtml = (text: string) => {
+      return text
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+    };
+    
+    const flushParagraph = () => {
+      if (currentParagraph.length > 0) {
+        const text = currentParagraph.join(' ').trim();
+        if (text) {
+          htmlParts.push(`<p>${escapeHtml(text)}</p>`);
+        }
+        currentParagraph = [];
+      }
+    };
+    
+    const closeList = () => {
+      if (inList && listType) {
+        htmlParts.push(listType === 'ol' ? '</ol>' : '</ul>');
+        inList = false;
+        listType = null;
+      }
+    };
+    
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      const trimmed = line.trim();
+      
+      // Skip empty lines - they end paragraphs
+      if (!trimmed) {
+        flushParagraph();
+        closeList();
+        continue;
+      }
+      
+      // Main section headers: ═══════════════════════════════
+      if (/^═{5,}$/.test(trimmed)) {
+        flushParagraph();
+        closeList();
+        // Look for title on next line
+        if (i + 1 < lines.length && lines[i + 1].trim() && !/^[═─]/.test(lines[i + 1].trim())) {
+          const title = lines[i + 1].trim();
+          // Check if there's a closing line of ═
+          if (i + 2 < lines.length && /^═{5,}$/.test(lines[i + 2].trim())) {
+            htmlParts.push(`<h1 class="main-title">${escapeHtml(title)}</h1>`);
+            i += 2; // Skip title and closing line
+            continue;
+          }
+        }
+        // Just a decorative line
+        htmlParts.push('<hr class="section-divider" />');
+        continue;
+      }
+      
+      // Sub-section headers: ───────────────────────────────
+      if (/^─{5,}$/.test(trimmed)) {
+        flushParagraph();
+        closeList();
+        // Look for title on next line
+        if (i + 1 < lines.length && lines[i + 1].trim() && !/^[═─]/.test(lines[i + 1].trim())) {
+          const title = lines[i + 1].trim();
+          // Check if there's a closing line of ─
+          if (i + 2 < lines.length && /^─{5,}$/.test(lines[i + 2].trim())) {
+            htmlParts.push(`<h2 class="section-title">${escapeHtml(title)}</h2>`);
+            i += 2; // Skip title and closing line
+            continue;
+          }
+        }
+        // Just a decorative line
+        htmlParts.push('<hr class="subsection-divider" />');
+        continue;
+      }
+      
+      // Numbered items: "1." or "1.1" or "(1)" or "(a)" at start
+      const numberedMatch = trimmed.match(/^(\d+\.(?:\d+)?|\(\d+\)|\([a-z]\))\s+(.+)$/i);
+      if (numberedMatch) {
+        flushParagraph();
+        if (!inList || listType !== 'ol') {
+          closeList();
+          htmlParts.push('<ol class="legal-list">');
+          inList = true;
+          listType = 'ol';
+        }
+        htmlParts.push(`<li><span class="list-marker">${escapeHtml(numberedMatch[1])}</span> ${escapeHtml(numberedMatch[2])}</li>`);
+        continue;
+      }
+      
+      // Bullet points: •, ☐, ☒, -, *
+      const bulletMatch = trimmed.match(/^([•☐☒\-\*])\s+(.+)$/);
+      if (bulletMatch) {
+        flushParagraph();
+        if (!inList || listType !== 'ul') {
+          closeList();
+          htmlParts.push('<ul class="bullet-list">');
+          inList = true;
+          listType = 'ul';
+        }
+        const checkClass = bulletMatch[1] === '☒' ? ' class="checked"' : bulletMatch[1] === '☐' ? ' class="unchecked"' : '';
+        htmlParts.push(`<li${checkClass}>${escapeHtml(bulletMatch[2])}</li>`);
+        continue;
+      }
+      
+      // ALL CAPS lines (likely headings)
+      if (trimmed === trimmed.toUpperCase() && trimmed.length > 3 && /[A-Z]/.test(trimmed) && !/^\d/.test(trimmed)) {
+        flushParagraph();
+        closeList();
+        // Check if it looks like a section header
+        if (trimmed.includes(':') || trimmed.length < 60) {
+          htmlParts.push(`<h3 class="subsection-heading">${escapeHtml(trimmed)}</h3>`);
+        } else {
+          htmlParts.push(`<p class="emphasis">${escapeHtml(trimmed)}</p>`);
+        }
+        continue;
+      }
+      
+      // Signature/form lines: _______ or [User to complete]
+      if (/_{5,}/.test(trimmed) || /\[.*to complete.*\]/i.test(trimmed)) {
+        flushParagraph();
+        closeList();
+        htmlParts.push(`<p class="form-field">${escapeHtml(trimmed)}</p>`);
+        continue;
+      }
+      
+      // Indented content (starts with spaces/tabs)
+      if (/^\s{3,}/.test(line) && !numberedMatch && !bulletMatch) {
+        flushParagraph();
+        closeList();
+        htmlParts.push(`<p class="indented">${escapeHtml(trimmed)}</p>`);
+        continue;
+      }
+      
+      // Regular text - accumulate into paragraph
+      closeList();
+      currentParagraph.push(trimmed);
+    }
+    
+    // Flush remaining content
+    flushParagraph();
+    closeList();
+    
+    const htmlBody = htmlParts.join('\n');
 
     return `<!DOCTYPE html>
 <html lang="en">
@@ -120,59 +262,274 @@ export function DocumentStatus({ caseId }: DocumentStatusProps) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${doc.title}</title>
   <style>
+    @page {
+      size: A4;
+      margin: 2.5cm 2cm;
+    }
+    
+    * {
+      box-sizing: border-box;
+    }
+    
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+      font-family: 'Times New Roman', Times, Georgia, serif;
+      font-size: 12pt;
       line-height: 1.6;
-      max-width: 800px;
+      max-width: 210mm;
       margin: 0 auto;
-      padding: 40px 20px;
-      color: #1a1a1a;
+      padding: 50px 60px;
+      color: #000000;
       background: #ffffff;
     }
-    h1 {
-      color: #2563eb;
-      border-bottom: 3px solid #2563eb;
-      padding-bottom: 10px;
-      margin-bottom: 30px;
+    
+    /* Document Header */
+    .document-header {
+      text-align: center;
+      margin-bottom: 35px;
+      padding-bottom: 25px;
+      border-bottom: 3px double #000;
     }
+    
+    .document-title {
+      font-size: 20pt;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      margin: 0 0 12px 0;
+    }
+    
+    .document-subtitle {
+      font-size: 11pt;
+      color: #333;
+      margin: 5px 0;
+      font-style: italic;
+    }
+    
+    /* Main Titles (from ═══ blocks) */
+    h1.main-title {
+      font-size: 16pt;
+      font-weight: bold;
+      text-transform: uppercase;
+      text-align: center;
+      margin: 35px 0 25px 0;
+      padding: 15px 20px;
+      border: 2px solid #000;
+      background: #f8f8f8;
+      letter-spacing: 1px;
+    }
+    
+    /* Section Titles (from ─── blocks) */
+    h2.section-title {
+      font-size: 13pt;
+      font-weight: bold;
+      text-transform: uppercase;
+      margin: 30px 0 18px 0;
+      padding: 12px 0;
+      border-top: 2px solid #000;
+      border-bottom: 1px solid #000;
+      text-align: center;
+      letter-spacing: 0.5px;
+    }
+    
+    /* Subsection headings (ALL CAPS lines) */
+    h3.subsection-heading {
+      font-size: 12pt;
+      font-weight: bold;
+      margin: 25px 0 12px 0;
+      padding-bottom: 6px;
+      border-bottom: 1px solid #666;
+    }
+    
+    /* Divider lines */
+    hr.section-divider {
+      border: none;
+      border-top: 3px double #000;
+      margin: 30px 0;
+    }
+    
+    hr.subsection-divider {
+      border: none;
+      border-top: 1px solid #666;
+      margin: 20px 0;
+    }
+    
+    /* Paragraphs */
     p {
-      margin: 1em 0;
+      margin: 0 0 14pt 0;
+      text-align: justify;
+      text-indent: 0;
     }
+    
+    p.emphasis {
+      font-weight: bold;
+      text-align: center;
+      margin: 20px 0;
+    }
+    
+    p.indented {
+      margin-left: 40px;
+      margin-bottom: 10pt;
+    }
+    
+    p.form-field {
+      font-family: 'Courier New', monospace;
+      background: #fafafa;
+      padding: 8px 12px;
+      border: 1px dashed #ccc;
+      margin: 10px 0;
+    }
+    
+    /* Ordered Lists (numbered items) */
+    ol.legal-list {
+      list-style: none;
+      padding: 0;
+      margin: 15px 0;
+      counter-reset: none;
+    }
+    
+    ol.legal-list li {
+      margin: 12px 0;
+      padding-left: 45px;
+      position: relative;
+      text-align: justify;
+    }
+    
+    ol.legal-list li .list-marker {
+      position: absolute;
+      left: 0;
+      font-weight: bold;
+      min-width: 40px;
+    }
+    
+    /* Unordered Lists (bullet points) */
+    ul.bullet-list {
+      list-style: none;
+      padding: 0;
+      margin: 15px 0 15px 25px;
+    }
+    
+    ul.bullet-list li {
+      margin: 8px 0;
+      padding-left: 20px;
+      position: relative;
+    }
+    
+    ul.bullet-list li::before {
+      content: "•";
+      position: absolute;
+      left: 0;
+      font-weight: bold;
+    }
+    
+    ul.bullet-list li.checked::before {
+      content: "☒";
+    }
+    
+    ul.bullet-list li.unchecked::before {
+      content: "☐";
+    }
+    
+    /* Signature Block */
+    .signature-block {
+      margin-top: 50px;
+      page-break-inside: avoid;
+    }
+    
+    .signature-line {
+      border-top: 1px solid #000;
+      width: 280px;
+      margin: 50px 0 8px 0;
+    }
+    
+    .signature-label {
+      font-size: 10pt;
+      color: #333;
+    }
+    
+    /* Footer */
+    .document-footer {
+      margin-top: 60px;
+      padding-top: 20px;
+      border-top: 1px solid #999;
+      font-size: 9pt;
+      color: #666;
+      text-align: center;
+    }
+    
+    /* Evidence Images */
     .evidence-image {
       max-width: 100%;
       height: auto;
-      border: 1px solid #e5e7eb;
-      border-radius: 8px;
-      margin: 20px 0;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      border: 1px solid #ccc;
+      margin: 15px 0;
+      display: block;
     }
+    
     .evidence-ref {
-      font-weight: bold;
-      color: #7c3aed;
-      margin-top: 30px;
-      padding: 10px;
-      background: #f3f4f6;
-      border-left: 4px solid #7c3aed;
+      background: #f0f0f0;
+      padding: 8px 12px;
+      margin: 20px 0 10px 0;
+      border-left: 4px solid #333;
     }
+    
+    /* Print optimization */
     @media print {
-      body { padding: 20px; }
-      .evidence-image { page-break-inside: avoid; }
+      body {
+        padding: 0;
+        max-width: none;
+        box-shadow: none;
+      }
+      
+      .document-header {
+        margin-top: 0;
+      }
+      
+      h1.main-title,
+      h2.section-title,
+      h3.subsection-heading {
+        page-break-after: avoid;
+      }
+      
+      ol.legal-list li,
+      ul.bullet-list li {
+        page-break-inside: avoid;
+      }
+      
+      .signature-block {
+        page-break-inside: avoid;
+      }
+    }
+    
+    /* Screen display */
+    @media screen {
+      body {
+        box-shadow: 0 2px 20px rgba(0,0,0,0.15);
+        margin: 30px auto;
+        border: 1px solid #ddd;
+      }
     }
   </style>
 </head>
 <body>
-  <h1>${doc.title}</h1>
-  <p>${content}</p>
-  <footer style="margin-top: 60px; padding-top: 20px; border-top: 2px solid #e5e7eb; color: #6b7280; font-size: 0.875rem;">
-    <p>Generated: ${new Date(doc.createdAt).toLocaleDateString('en-GB', { 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    })}</p>
-    <p>DisputeHub - Legal Document Generation</p>
-  </footer>
+  <div class="document-header">
+    <h1 class="document-title">${escapeHtml(doc.title)}</h1>
+    <p class="document-subtitle">
+      Generated: ${new Date(doc.createdAt).toLocaleDateString('en-GB', { 
+        day: 'numeric',
+        month: 'long', 
+        year: 'numeric'
+      })}
+    </p>
+  </div>
+  
+  <div class="document-body">
+    ${htmlBody}
+  </div>
+  
+  <div class="document-footer">
+    <p>This document was prepared using DisputeHub Legal Document System</p>
+    <p>Document Reference: ${doc.id.slice(0, 12).toUpperCase()}</p>
+  </div>
 </body>
 </html>`;
   };
@@ -249,25 +606,25 @@ export function DocumentStatus({ caseId }: DocumentStatusProps) {
 
   // Phase 8.5-8.7: Routing status indicators
   const routingStatusColors = {
-    PENDING: "text-yellow-400 bg-yellow-500/10 border-yellow-500/30",
-    APPROVED: "text-emerald-400 bg-emerald-500/10 border-emerald-500/30",
-    BLOCKED: "text-red-400 bg-red-500/10 border-red-500/30",
-    REQUIRES_CLARIFICATION: "text-orange-400 bg-orange-500/10 border-orange-500/30",
+    PENDING: "text-yellow-700 bg-yellow-50 border-yellow-200",
+    APPROVED: "text-emerald-700 bg-emerald-50 border-emerald-200",
+    BLOCKED: "text-red-700 bg-red-50 border-red-200",
+    REQUIRES_CLARIFICATION: "text-orange-700 bg-orange-50 border-orange-200",
   };
 
   const isBlocked = plan?.routingStatus === "BLOCKED";
 
   return (
-    <div className="rounded-2xl bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700 overflow-hidden">
+    <div className="rounded-xl bg-white border border-slate-200 overflow-hidden shadow-sm">
       {/* Header */}
-      <div className="px-6 py-4 border-b border-slate-700">
+      <div className="px-6 py-4 border-b border-slate-200">
         <div className="flex items-center gap-3">
-          <div className="p-2 rounded-xl bg-purple-500/10">
-            <FileText className="h-5 w-5 text-purple-400" />
+          <div className="p-2 rounded-xl bg-blue-50">
+            <FileText className="h-5 w-5 text-blue-600" />
           </div>
           <div className="flex-1">
-            <h3 className="text-base font-semibold text-white">Documents</h3>
-            <p className="text-xs text-slate-400 mt-0.5">
+            <h3 className="text-base font-semibold text-slate-900">Documents</h3>
+            <p className="text-xs text-slate-500 mt-0.5">
               {loading ? (
                 "Loading..."
               ) : totalDocs === 0 ? (
@@ -288,7 +645,7 @@ export function DocumentStatus({ caseId }: DocumentStatusProps) {
             
             {plan && (
               <div className="text-right">
-                <div className="text-xs font-medium text-purple-400">
+                <div className="text-xs font-medium text-blue-600">
                   {plan.complexity}
                 </div>
                 <div className="text-xs text-slate-500">
@@ -302,13 +659,13 @@ export function DocumentStatus({ caseId }: DocumentStatusProps) {
         {/* Phase 8.5-8.7: Routing Status */}
         {plan?.routingStatus && (
           <div className="mt-4">
-            <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-medium ${routingStatusColors[plan.routingStatus as keyof typeof routingStatusColors] || "text-slate-400 bg-slate-500/10 border-slate-500/30"}`}>
+            <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-medium ${routingStatusColors[plan.routingStatus as keyof typeof routingStatusColors] || "text-slate-600 bg-slate-50 border-slate-200"}`}>
               <span className="font-semibold">Route:</span>
               {plan.routingStatus}
               {plan.routingConfidence && ` (${Math.round(plan.routingConfidence * 100)}%)`}
             </div>
             {plan.jurisdiction && plan.forum && (
-              <p className="text-xs text-slate-400 mt-2">
+              <p className="text-xs text-slate-500 mt-2">
                 {plan.jurisdiction} → {plan.forum}
               </p>
             )}
@@ -317,14 +674,14 @@ export function DocumentStatus({ caseId }: DocumentStatusProps) {
 
         {/* Phase 8.5-8.7: BLOCKED State Warning */}
         {isBlocked && (
-          <div className="mt-4 p-4 rounded-xl bg-red-500/10 border border-red-500/30">
+          <div className="mt-4 p-4 rounded-xl bg-red-50 border border-red-200">
             <div className="flex items-start gap-3">
-              <AlertCircle className="h-5 w-5 text-red-400 flex-shrink-0 mt-0.5" />
+              <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
               <div className="flex-1">
-                <h4 className="text-sm font-semibold text-red-300 mb-1">
+                <h4 className="text-sm font-semibold text-red-800 mb-1">
                   Document Generation Blocked
                 </h4>
-                <p className="text-xs text-red-200/80 mb-2">
+                <p className="text-xs text-red-700 mb-2">
                   {plan.blockType === "MISSING_PREREQUISITE" && "Missing required prerequisites"}
                   {plan.blockType === "TIME_LIMIT_EXPIRED" && "Time limit has expired"}
                   {plan.blockType === "INSUFFICIENT_INFORMATION" && "More information needed"}
@@ -332,7 +689,7 @@ export function DocumentStatus({ caseId }: DocumentStatusProps) {
                   {!plan.blockType && "Unable to proceed with document generation"}
                 </p>
                 {plan.nextAction && (
-                  <p className="text-xs text-red-300 font-medium">
+                  <p className="text-xs text-red-800 font-medium">
                     Next Step: {plan.nextAction}
                   </p>
                 )}
@@ -345,7 +702,7 @@ export function DocumentStatus({ caseId }: DocumentStatusProps) {
         {totalDocs > 0 && generatingDocs > 0 && (
           <div className="mt-4">
             <Progress value={progressPercent} className="h-2" />
-            <p className="text-xs text-slate-400 mt-2">
+            <p className="text-xs text-slate-500 mt-2">
               {completedDocs} completed • {generatingDocs} generating • {failedDocs} failed
             </p>
           </div>
@@ -356,13 +713,13 @@ export function DocumentStatus({ caseId }: DocumentStatusProps) {
       <div className="p-4">
         {loading ? (
           <div className="text-center py-8">
-            <Clock className="h-8 w-8 text-slate-500 mx-auto mb-2 animate-spin" />
-            <p className="text-sm text-slate-400">Loading documents...</p>
+            <Clock className="h-8 w-8 text-slate-400 mx-auto mb-2 animate-spin" />
+            <p className="text-sm text-slate-500">Loading documents...</p>
           </div>
         ) : documents.length === 0 ? (
           <div className="text-center py-8">
-            <FileText className="h-12 w-12 text-slate-600 mx-auto mb-3 opacity-50" />
-            <p className="text-sm font-medium text-slate-300 mb-1">No Documents Yet</p>
+            <FileText className="h-12 w-12 text-slate-400 mx-auto mb-3 opacity-50" />
+            <p className="text-sm font-medium text-slate-700 mb-1">No Documents Yet</p>
             <p className="text-xs text-slate-500">
               Continue chatting with the AI to build your case
             </p>
@@ -372,35 +729,36 @@ export function DocumentStatus({ caseId }: DocumentStatusProps) {
             {documents.map((doc) => (
               <div
                 key={doc.id}
-                className="flex items-center gap-3 p-3 rounded-xl bg-slate-800/50 border border-slate-700/50 hover:border-slate-600 transition-colors"
+                className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 border border-slate-200 hover:border-blue-300 transition-colors cursor-pointer group"
+                onClick={() => doc.status === "COMPLETED" && handleDownload(doc)}
               >
                 {/* Status Icon */}
                 <div className="flex-shrink-0">
                   {doc.status === "COMPLETED" && (
-                    <CheckCircle className="h-5 w-5 text-emerald-400" />
+                    <CheckCircle className="h-5 w-5 text-emerald-600" />
                   )}
                   {(doc.status === "GENERATING" || doc.status === "PENDING") && (
-                    <Clock className="h-5 w-5 text-blue-400 animate-spin" />
+                    <Clock className="h-5 w-5 text-blue-600 animate-spin" />
                   )}
                   {doc.status === "FAILED" && (
-                    <AlertCircle className="h-5 w-5 text-red-400" />
+                    <AlertCircle className="h-5 w-5 text-red-600" />
                   )}
                 </div>
 
                 {/* Document Info */}
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-white truncate">
+                  <p className="text-sm font-medium text-slate-900 truncate group-hover:text-blue-600 transition-colors">
                     {doc.title}
                   </p>
-                  <p className="text-xs text-slate-400">
-                    {doc.status === "COMPLETED" && `${doc.content.length} characters • Ready`}
+                  <p className="text-xs text-slate-500">
+                    {doc.status === "COMPLETED" && "Click to view & download"}
                     {doc.status === "GENERATING" && "Generating content..."}
                     {doc.status === "PENDING" && "Waiting to generate..."}
                     {doc.status === "FAILED" && (
                       <>
                         Failed{doc.retryCount ? ` (${doc.retryCount} retries)` : ""}
                         {doc.lastError && (
-                          <span className="block text-xs text-red-400 mt-1 truncate">
+                          <span className="block text-xs text-red-600 mt-1 truncate">
                             {doc.lastError}
                           </span>
                         )}
@@ -410,13 +768,17 @@ export function DocumentStatus({ caseId }: DocumentStatusProps) {
                 </div>
 
                 {/* Actions */}
-                <div className="flex-shrink-0 flex gap-2">
+                <div className="flex-shrink-0 flex gap-1">
                   {doc.status === "COMPLETED" && (
                     <Button
                       size="sm"
                       variant="ghost"
-                      onClick={() => handleDownload(doc)}
-                      className="text-purple-400 hover:text-purple-300 hover:bg-purple-500/10"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDownload(doc);
+                      }}
+                      className="text-blue-600 hover:text-blue-700 hover:bg-slate-100"
+                      title="Download HTML"
                     >
                       <Download className="h-4 w-4" />
                     </Button>
@@ -425,9 +787,12 @@ export function DocumentStatus({ caseId }: DocumentStatusProps) {
                     <Button
                       size="sm"
                       variant="ghost"
-                      onClick={() => handleRetry(doc.id)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleRetry(doc.id);
+                      }}
                       disabled={retrying === doc.id}
-                      className="text-orange-400 hover:text-orange-300 hover:bg-orange-500/10"
+                      className="text-orange-600 hover:text-orange-700 hover:bg-slate-100"
                     >
                       <RefreshCw className={`h-4 w-4 ${retrying === doc.id ? "animate-spin" : ""}`} />
                     </Button>

@@ -14,7 +14,8 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUserId } from "@/lib/auth";
-import { generateAIContent } from "@/lib/ai/document-content";
+import { generateFormSpecificDocument } from "@/lib/ai/system3-generation"; // System 3
+import { enrichFactsForDocumentGeneration, type ExtractedFacts } from "@/lib/ai/system-b-extractor";
 import { executeRoutingEngine } from "@/lib/legal/routing-engine";
 import { validateRoutingDecision, validateDocumentGeneration } from "@/lib/legal/gate-validator";
 import { validateGeneratedDocument, getValidationDetails } from "@/lib/legal/document-validator";
@@ -53,23 +54,79 @@ export async function POST(
       console.log(`[System 3] Case already in phase: ${dispute.phase}`);
     }
 
-    const strategy = await prisma.caseStrategy.findFirst({
-      where: { caseId },
-    });
-
-    if (!strategy) {
+    // NEW: Use caseSummary from dispute (4-layer system)
+    console.log(`[System 3] caseSummary exists: ${!!dispute.caseSummary}, summaryConfirmed: ${dispute.summaryConfirmed}`);
+    if (!dispute.caseSummary) {
+      console.log(`[System 3] ❌ Blocked: No case summary exists`);
       return NextResponse.json(
-        { error: "No case strategy found. Continue chatting with the AI." },
+        { error: "No case summary available. Please complete the chat first to gather case details." },
         { status: 400 }
       );
     }
+    
+    // Auto-confirm summary if it exists but isn't confirmed yet (mobile app UX improvement)
+    if (!dispute.summaryConfirmed) {
+      console.log(`[System 3] Auto-confirming summary for mobile app flow`);
+      await prisma.dispute.update({
+        where: { id: caseId },
+        data: { summaryConfirmed: true, summaryConfirmedAt: new Date() }
+      });
+    }
+
+    // Fetch user profile for document personalization
+    const userProfile = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        firstName: true,
+        lastName: true,
+        email: true,
+        phone: true,
+        addressLine1: true,
+        addressLine2: true,
+        city: true,
+        postcode: true,
+      }
+    });
+    
+    // ========================================================================
+    // PROFILE COMPLETENESS CHECK - Required for legal documents
+    // ========================================================================
+    
+    const requiredFields = ['firstName', 'lastName', 'addressLine1', 'city', 'postcode'];
+    const missingFields = requiredFields.filter(field => 
+      !userProfile || !userProfile[field as keyof typeof userProfile]
+    );
+    
+    if (missingFields.length > 0) {
+      console.log(`[System 3] ❌ Profile incomplete. Missing: ${missingFields.join(', ')}`);
+      return NextResponse.json({
+        error: "Profile incomplete",
+        code: "PROFILE_INCOMPLETE",
+        message: "Your profile must be complete to generate legal documents. Your name and address will appear on official documents.",
+        missingFields,
+        requiresProfileCompletion: true
+      }, { status: 400 });
+    }
+    
+    console.log(`[System 3] ✅ Profile complete: ${userProfile?.firstName} ${userProfile?.lastName}`);
 
     const evidence = await prisma.evidenceItem.findMany({
       where: { caseId },
       orderBy: { evidenceIndex: "asc" },
     });
 
-    console.log(`[System 3] Data: ${strategy.keyFacts?.length || 0} facts, ${evidence.length} evidence items`);
+    // Parse caseSummary as ExtractedFacts
+    const rawExtractedFacts: ExtractedFacts = typeof dispute.caseSummary === 'string' 
+      ? JSON.parse(dispute.caseSummary)
+      : dispute.caseSummary;
+
+    // CRITICAL: Enrich extracted facts into document-generation-ready format
+    // This transforms System B's structured output (parties.counterparty, financialAmount)
+    // into the keyFacts[] format that document generators expect ("The other party is: XYZ")
+    const enrichedStrategy = enrichFactsForDocumentGeneration(rawExtractedFacts);
+    
+    console.log(`[System 3] Data: ${enrichedStrategy.keyFacts?.length || 0} enriched facts, ${evidence.length} evidence items`);
+    console.log(`[System 3] Enriched: counterparty=${enrichedStrategy.counterpartyName}, amount=${enrichedStrategy.amount}`);
 
     // ========================================================================
     // STEP 2: Get or create DocumentPlan with routing decision
@@ -95,14 +152,17 @@ export async function POST(
       });
 
       // Execute System 2
+      // Use enriched keyFacts for routing, but also pass raw extracted data
       const classificationInput: ClassificationInput = {
         caseId,
         caseTitle: dispute.title,
-        keyFacts: Array.isArray(strategy.keyFacts) ? strategy.keyFacts as string[] : [],
-        disputeType: strategy.disputeType,
-        desiredOutcome: strategy.desiredOutcome || "",
+        keyFacts: enrichedStrategy.keyFacts || [],
+        disputeType: rawExtractedFacts.disputeType || dispute.type || "OTHER",
+        desiredOutcome: enrichedStrategy.desiredOutcome || "",
         evidenceCount: evidence.length,
-        evidenceTypes: evidence.map(e => e.fileType || "unknown")
+        evidenceTypes: evidence.map(e => e.fileType || "unknown"),
+        // CRITICAL: Pass user's explicitly chosen forum to respect their decision
+        userChosenForum: rawExtractedFacts.chosenForum || undefined,
       };
 
       const routingResponse = await executeRoutingEngine(classificationInput);
@@ -303,23 +363,63 @@ export async function POST(
       console.log(`[System 3] ${i + 1}/${documentsToGenerate.length}: Generating ${formId}...`);
 
       try {
-        // Generate AI content
-        const content = await generateAIContent({
+        // Generate AI content or PDF using System 3 (form-specific generation)
+        // Pass enrichedStrategy which has keyFacts[] in the format document helpers expect
+        const result = await generateFormSpecificDocument(
           formId,
-          strategy,
+          routingDecision!,
+          enrichedStrategy as any, // Enriched facts compatible with CaseStrategy interface
           evidence,
-          caseTitle: dispute.title,
-          routingDecision: routingDecision!
-        });
+          dispute.title,
+          userProfile || undefined // Pass user profile for document personalization
+        );
 
-        // STRONG VALIDATION
-        const validation = await validateGeneratedDocument(content, formId);
+        // Check if result is a PDF or text document
+        const isPdf = typeof result === 'object' && result.type === "PDF";
+        const content = isPdf ? `[PDF FORM - ${result.filename}]` : result as string;
 
-        if (!validation.valid) {
-          // FAIL IMMEDIATELY - don't save invalid document
-          console.error(`[System 3] ❌ ${formId} FAILED VALIDATION:`);
-          console.error(getValidationDetails(validation));
+        // If PDF, save binary data separately
+        let pdfBinaryData: Buffer | null = null;
+        let filename: string | null = null;
+        
+        if (isPdf) {
+          pdfBinaryData = Buffer.from(result.data);
+          filename = result.filename;
+          console.log(`[System 3] 📄 Generated PDF: ${filename} (${pdfBinaryData.length.toLocaleString()} bytes)`);
+        }
 
+        // STRONG VALIDATION (only for text documents)
+        if (!isPdf) {
+          const validation = await validateGeneratedDocument(content, formId);
+
+          if (!validation.valid) {
+            // FAIL IMMEDIATELY - don't save invalid document
+            console.error(`[System 3] ❌ ${formId} FAILED VALIDATION:`);
+            console.error(getValidationDetails(validation));
+
+            await prisma.generatedDocument.create({
+              data: {
+                planId: documentPlan.id,
+                caseId,
+                type: formId,
+                title: metadata.officialName,
+                description: `Official ${metadata.officialName}`,
+                order: i + 1,
+                content: "", // Empty - validation failed
+                status: "FAILED",
+                lastError: `Validation failed: ${validation.errors.join("; ")}`,
+                validationErrors: validation.errors,
+                validationWarnings: validation.warnings,
+                validatedAt: validation.validatedAt,
+                retryCount: 0
+              }
+            });
+
+            failedDocs.push({ formId, error: validation.errors.join("; ") });
+            continue;
+          }
+
+          // Validation passed - save text document
           await prisma.generatedDocument.create({
             data: {
               planId: documentPlan.id,
@@ -328,40 +428,37 @@ export async function POST(
               title: metadata.officialName,
               description: `Official ${metadata.officialName}`,
               order: i + 1,
-              content: "", // Empty - validation failed
-              status: "FAILED",
-              lastError: `Validation failed: ${validation.errors.join("; ")}`,
-              validationErrors: validation.errors,
-              validationWarnings: validation.warnings,
+              content,
+              status: "COMPLETED",
+              validationWarnings: validation.warnings.length > 0 ? (validation.warnings as any) : null,
               validatedAt: validation.validatedAt,
               retryCount: 0
             }
           });
 
-          failedDocs.push({ formId, error: validation.errors.join("; ") });
-          continue;
+          generatedDocs.push(formId);
+          console.log(`[System 3] ✅ ${formId} completed (${content.length.toLocaleString()} chars)`);
+        } else {
+          // Save PDF document
+          await prisma.generatedDocument.create({
+            data: {
+              planId: documentPlan.id,
+              caseId,
+              type: formId,
+              title: metadata.officialName,
+              description: `Official ${metadata.officialName} (PDF)`,
+              order: i + 1,
+              content, // Placeholder text
+              pdfData: pdfBinaryData as any,
+              pdfFilename: filename,
+              status: "COMPLETED",
+              retryCount: 0
+            }
+          });
+
+          generatedDocs.push(formId);
+          console.log(`[System 3] ✅ ${formId} completed as PDF`);
         }
-
-        // Validation passed - save document
-        await prisma.generatedDocument.create({
-          data: {
-            planId: documentPlan.id,
-            caseId,
-            type: formId,
-            title: metadata.officialName,
-            description: `Official ${metadata.officialName}`,
-            order: i + 1,
-            content,
-            status: "COMPLETED",
-            validationWarnings: validation.warnings.length > 0 ? validation.warnings : null,
-            validatedAt: validation.validatedAt,
-            retryCount: 0
-          }
-        });
-
-        generatedDocs.push(formId);
-        console.log(`[System 3] ✅ ${formId} completed (${content.length} chars)`);
-
       } catch (error) {
         console.error(`[System 3] ❌ ${formId} generation error:`, error);
 
@@ -394,18 +491,9 @@ export async function POST(
     await prisma.caseEvent.create({
       data: {
         caseId,
-        type: "DOCUMENTS_GENERATED",
-        title: "Legal Documents Generated",
+        type: "DOCUMENTS_GENERATING",
         description: `Generated ${generatedDocs.length}/${documentsToGenerate.length} documents via System 2 routing (${routingDecision!.forum})`,
-        metadata: {
-          forum: routingDecision!.forum,
-          jurisdiction: routingDecision!.jurisdiction,
-          relationship: routingDecision!.relationship,
-          successCount: generatedDocs.length,
-          failedCount: failedDocs.length,
-          documentTypes: documentsToGenerate,
-          duration: Date.now() - startTime
-        } as any
+        occurredAt: new Date()
       }
     });
 

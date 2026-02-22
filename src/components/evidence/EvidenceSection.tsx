@@ -65,51 +65,51 @@ export function EvidenceSection({ caseId, initialExpanded = false, onEvidenceUpl
   };
 
   return (
-    <div className="rounded-3xl glass-strong border border-indigo-500/20 overflow-hidden">
+    <div className="rounded-xl bg-white border border-slate-200 overflow-hidden shadow-sm">
       {/* Header */}
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        className="w-full p-6 flex items-center justify-between hover:bg-indigo-500/5 transition-colors"
+        className="w-full p-6 flex items-center justify-between hover:bg-slate-50 transition-colors"
       >
         <div className="flex items-center gap-3">
-          <div className="p-2 rounded-xl bg-indigo-500/20 border border-indigo-500/30">
-            <Folder className="h-5 w-5 text-indigo-400" />
+          <div className="p-2 rounded-xl bg-blue-50 border border-slate-200">
+            <Folder className="h-5 w-5 text-blue-600" />
           </div>
           <div className="text-left">
-            <h2 className="text-xl font-bold text-white">Evidence</h2>
-            <p className="text-sm text-slate-400">
+            <h2 className="text-xl font-bold text-slate-900">Evidence</h2>
+            <p className="text-sm text-slate-500">
               {isLoading ? "Loading..." : `${evidence.length} item${evidence.length !== 1 ? 's' : ''}`}
             </p>
           </div>
         </div>
         <div className="flex items-center gap-2">
           {evidence.length > 0 && (
-            <span className="px-3 py-1 rounded-lg bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 text-sm font-medium">
+            <span className="px-3 py-1 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-700 text-sm font-medium">
               {evidence.length} evidence
             </span>
           )}
           {isExpanded ? (
-            <ChevronUp className="h-5 w-5 text-slate-400" />
+            <ChevronUp className="h-5 w-5 text-slate-500" />
           ) : (
-            <ChevronDown className="h-5 w-5 text-slate-400" />
+            <ChevronDown className="h-5 w-5 text-slate-500" />
           )}
         </div>
       </button>
 
       {/* Content */}
       {isExpanded && (
-        <div className="border-t border-indigo-500/20 p-6 space-y-6">
+        <div className="border-t border-slate-200 p-6 space-y-6">
           {/* Upload Section */}
           <div className="space-y-4">
             <div className="flex items-center gap-2">
-              <UploadIcon className="h-5 w-5 text-indigo-400" />
-              <h3 className="text-lg font-semibold text-white">Upload New Evidence</h3>
+              <UploadIcon className="h-5 w-5 text-blue-600" />
+              <h3 className="text-lg font-semibold text-slate-900">Upload New Evidence</h3>
             </div>
             <EvidenceUploadBulk caseId={caseId} onUploadComplete={handleUploadComplete} />
           </div>
 
           {/* Evidence List */}
-          <div className="pt-6 border-t border-indigo-500/10">
+          <div className="pt-6 border-t border-slate-200">
             <EvidenceList evidence={evidence} caseId={caseId} />
           </div>
         </div>

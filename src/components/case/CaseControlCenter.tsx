@@ -84,8 +84,8 @@ export function CaseControlCenter({
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h2 className="text-lg font-semibold text-gray-900">Case Status</h2>
-        <p className="mt-1 text-sm text-gray-600">{caseTitle}</p>
+        <h2 className="text-lg font-semibold text-slate-900">Case Status</h2>
+        <p className="mt-1 text-sm text-slate-600">{caseTitle}</p>
       </div>
 
       {/* Status Header */}
@@ -124,13 +124,13 @@ export function CaseControlCenter({
 
       {/* Embedded Timeline */}
       <div>
-        <h3 className="mb-4 text-sm font-semibold text-gray-900">
+        <h3 className="mb-4 text-sm font-semibold text-slate-900">
           Recent Activity
         </h3>
         {isLoadingTimeline ? (
-          <div className="rounded-lg border border-gray-200 bg-gray-50 p-8 text-center">
-            <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-gray-300 border-t-gray-600" />
-            <p className="mt-4 text-sm text-gray-600">Loading timeline...</p>
+          <div className="rounded-lg border border-slate-200 bg-slate-50 p-8 text-center">
+            <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-slate-300 border-t-slate-600" />
+            <p className="mt-4 text-sm text-slate-600">Loading timeline...</p>
           </div>
         ) : (
           <EmbeddedTimeline events={timelineEvents.slice(0, 5)} />

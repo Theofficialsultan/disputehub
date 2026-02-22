@@ -45,7 +45,7 @@ async function UploadEvidenceData() {
     orderBy: { updatedAt: "desc" },
   });
 
-  return <UploadEvidenceClient disputes={disputes} />;
+  return <UploadEvidenceClient disputes={disputes as any} />;
 }
 
 export default function UploadEvidencePage() {
@@ -54,8 +54,8 @@ export default function UploadEvidencePage() {
       fallback={
         <div className="flex h-[50vh] items-center justify-center">
           <div className="text-center">
-            <div className="mb-4 inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-indigo-500 border-r-transparent" />
-            <p className="text-sm text-slate-400">Loading...</p>
+            <div className="mb-4 inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-blue-600 border-r-transparent" />
+            <p className="text-sm text-slate-500">Loading...</p>
           </div>
         </div>
       }

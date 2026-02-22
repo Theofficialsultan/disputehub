@@ -199,6 +199,7 @@ export interface ClassificationInput {
   desiredOutcome: string;
   evidenceCount: number;
   evidenceTypes: string[];
+  userChosenForum?: string | null; // User's explicit choice - MUST be respected
   conversationHistory?: Array<{
     role: "user" | "assistant";
     content: string;

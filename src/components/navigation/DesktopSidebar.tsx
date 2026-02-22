@@ -3,106 +3,171 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  Home,
+  LayoutDashboard,
   FileText,
-  Clock,
-  Settings,
-  Plus,
-  HelpCircle,
-  Sparkles,
-  Scale,
   File,
+  BarChart3,
+  Sparkles,
+  Settings,
+  HelpCircle,
+  LogOut,
+  Download,
+  Scale,
+  Mail,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { UserButton } from "@clerk/nextjs";
-import { NotificationBell } from "@/components/notifications/NotificationBell";
 
-const navigation = [
-  { name: "Dashboard", href: "/disputes", icon: Home },
+const menuItems = [
+  { name: "Dashboard", href: "/disputes", icon: LayoutDashboard },
   { name: "Cases", href: "/cases", icon: FileText },
   { name: "Documents", href: "/documents", icon: File },
-  { name: "Lawyer", href: "/lawyer", icon: Scale },
-  { name: "Timeline", href: "/timeline", icon: Clock },
-  { name: "Help", href: "/help", icon: HelpCircle },
+  { name: "Email", href: "/email", icon: Mail },
+  { name: "Timeline", href: "/timeline", icon: BarChart3 },
+  { name: "AI Chat", href: "/ai-chat", icon: Sparkles },
+  { name: "Find a Lawyer", href: "/lawyer", icon: Scale },
+];
+
+const generalItems = [
   { name: "Settings", href: "/settings", icon: Settings },
+  { name: "Help", href: "/help", icon: HelpCircle },
 ];
 
 export function DesktopSidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="fixed inset-y-0 left-0 z-30 hidden w-72 flex-col lg:flex">
-      {/* Dark glass background */}
-      <div className="absolute inset-0 glass-strong backdrop-blur-3xl" />
+    <aside className="fixed inset-y-0 left-0 z-30 hidden w-[250px] flex-col lg:flex">
+      <div className="absolute inset-0 bg-white" />
       
-      {/* Gradient border */}
-      <div className="absolute inset-y-0 right-0 w-px bg-gradient-to-b from-transparent via-indigo-500/50 to-transparent" />
-      
-      {/* Content */}
       <div className="relative z-10 flex flex-col h-full">
-        {/* Logo */}
-        <div className="flex h-20 items-center gap-3 px-6 border-b border-indigo-500/20">
-          <div className="relative flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-600 to-purple-600 shadow-lg glow-purple">
-            <FileText className="h-6 w-6 text-white" />
+        {/* Logo - exactly like Donezo */}
+        <div className="flex h-[68px] items-center gap-3 px-6">
+          <div className="w-9 h-9 rounded-full bg-blue-600 flex items-center justify-center">
+            <img 
+              src="/logo-200.png" 
+              alt="DisputeHub" 
+              className="h-9 w-9 rounded-full"
+            />
           </div>
-          <div>
-            <span className="text-xl font-bold text-white">DisputeHub</span>
-            <div className="flex items-center gap-1.5 text-xs text-indigo-400 font-medium">
-              <Sparkles className="h-3 w-3" />
-              <span>AI Powered</span>
-            </div>
-          </div>
+          <span className="text-[17px] font-bold text-slate-900">DisputeHub</span>
         </div>
 
-        {/* Navigation */}
-        <nav className="flex-1 space-y-2 px-4 py-6">
-          <Button
-            asChild
-            size="lg"
-            className="w-full justify-start bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white border-0 shadow-lg glow-purple mb-6 h-14 rounded-2xl text-base font-semibold"
-          >
-            <Link href="/disputes/start">
-              <Plus className="mr-3 h-5 w-5" />
-              New Dispute
-            </Link>
-          </Button>
+        {/* MENU Section Label */}
+        <div className="px-6 pt-4 pb-2">
+          <p className="text-[11px] font-semibold text-slate-400 tracking-[0.08em] uppercase">Menu</p>
+        </div>
 
-          <div className="space-y-2">
-            {navigation.map((item) => {
-              const isActive =
-                pathname === item.href || pathname.startsWith(item.href + "/");
-              return (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  className={`group flex items-center gap-4 rounded-2xl px-5 py-4 text-base font-medium transition-all duration-300 ${
-                    isActive
-                      ? "bg-gradient-to-r from-indigo-600/30 to-purple-600/30 text-white border border-indigo-500/40 shadow-lg glow-purple"
-                      : "text-slate-400 hover:text-white hover:bg-indigo-500/10 border border-transparent"
-                  }`}
-                >
-                  <item.icon className={`h-5 w-5 ${isActive ? "text-indigo-400" : "text-slate-500 group-hover:text-indigo-400"} transition-colors`} />
+        {/* Menu Navigation */}
+        <nav className="px-3 space-y-1">
+          {menuItems.map((item) => {
+            const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
+            
+            return (
+              <Link
+                key={item.name}
+                href={item.href}
+                className={`group flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-150 ${
+                  isActive
+                    ? 'bg-blue-50/70'
+                    : 'hover:bg-slate-50'
+                }`}
+              >
+                {/* Icon container */}
+                <div className={`w-[34px] h-[34px] rounded-[10px] flex items-center justify-center transition-all ${
+                  isActive
+                    ? 'bg-blue-600'
+                    : ''
+                }`}>
+                  <item.icon className={`h-[18px] w-[18px] ${
+                    isActive ? 'text-white' : 'text-slate-400 group-hover:text-slate-500'
+                  }`} />
+                </div>
+                
+                {/* Label */}
+                <span className={`flex-1 text-[14px] ${
+                  isActive ? 'font-semibold text-slate-900' : 'font-medium text-slate-500 group-hover:text-slate-700'
+                }`}>
                   {item.name}
-                  {isActive && (
-                    <div className="ml-auto">
-                      <div className="h-2 w-2 rounded-full bg-gradient-to-r from-indigo-400 to-purple-400 animate-pulse shadow-lg shadow-indigo-400/50" />
-                    </div>
-                  )}
-                </Link>
-              );
-            })}
-          </div>
+                </span>
+                
+                {/* Badge */}
+                {(item as any).badge && (
+                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                    isActive 
+                      ? 'bg-blue-600 text-white' 
+                      : 'bg-blue-100 text-blue-600'
+                  }`}>
+                    {(item as any).badge}
+                  </span>
+                )}
+              </Link>
+            );
+          })}
         </nav>
 
-        {/* User */}
-        <div className="border-t border-indigo-500/20 p-4">
-          <div className="flex items-center gap-3 rounded-2xl p-4 glass hover:bg-indigo-500/10 transition-all duration-300 cursor-pointer border border-indigo-500/10">
-            <UserButton />
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-white truncate">Your Account</p>
-              <p className="text-xs text-slate-400">Manage settings</p>
+        {/* GENERAL Section Label */}
+        <div className="px-6 pt-7 pb-2">
+          <p className="text-[11px] font-semibold text-slate-400 tracking-[0.08em] uppercase">General</p>
+        </div>
+
+        {/* General Navigation */}
+        <nav className="px-3 space-y-1">
+          {generalItems.map((item) => {
+            const isActive = pathname === item.href;
+            
+            return (
+              <Link
+                key={item.name}
+                href={item.href}
+                className={`group flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-150 ${
+                  isActive ? 'bg-blue-50/70' : 'hover:bg-slate-50'
+                }`}
+              >
+                <div className={`w-[34px] h-[34px] rounded-[10px] flex items-center justify-center ${
+                  isActive ? 'bg-blue-600' : ''
+                }`}>
+                  <item.icon className={`h-[18px] w-[18px] ${
+                    isActive ? 'text-white' : 'text-slate-400 group-hover:text-slate-500'
+                  }`} />
+                </div>
+                <span className={`flex-1 text-[14px] ${
+                  isActive ? 'font-semibold text-slate-900' : 'font-medium text-slate-500 group-hover:text-slate-700'
+                }`}>
+                  {item.name}
+                </span>
+              </Link>
+            );
+          })}
+
+          {/* Logout */}
+          <button className="w-full group flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-150 hover:bg-slate-50">
+            <div className="w-[34px] h-[34px] rounded-[10px] flex items-center justify-center">
+              <LogOut className="h-[18px] w-[18px] text-slate-400 group-hover:text-slate-500" />
             </div>
-            <NotificationBell />
+            <span className="flex-1 text-[14px] font-medium text-slate-500 group-hover:text-slate-700 text-left">
+              Logout
+            </span>
+          </button>
+        </nav>
+
+        {/* Spacer */}
+        <div className="flex-1" />
+
+        {/* Download Mobile App Card - exactly like Donezo */}
+        <div className="px-4 pb-5">
+          <div className="rounded-2xl bg-slate-900 p-5 relative overflow-hidden">
+            {/* Decorative blur */}
+            <div className="absolute -top-4 -right-4 w-20 h-20 bg-blue-600/30 rounded-full blur-xl" />
+            
+            <div className="relative z-10">
+              <h4 className="text-white font-bold text-sm leading-tight mb-1">
+                Download our<br />Mobile App
+              </h4>
+              <p className="text-slate-400 text-[11px] mb-4">Get easy in another way</p>
+              <button className="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold transition-all flex items-center justify-center gap-2">
+                <Download className="h-4 w-4" />
+                Download
+              </button>
+            </div>
           </div>
         </div>
       </div>

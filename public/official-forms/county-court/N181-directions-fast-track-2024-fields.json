@@ -1,0 +1,517 @@
+[
+  {
+    "name": "Name of court",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Claim number",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "To be completed by, or on behalf of",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Who is the: legal representative",
+    "type": "PDFCheckBox",
+    "value": "[empty]"
+  },
+  {
+    "name": "Who is the: first",
+    "type": "PDFCheckBox",
+    "value": "[empty]"
+  },
+  {
+    "name": "Who is the: second",
+    "type": "PDFCheckBox",
+    "value": "[empty]"
+  },
+  {
+    "name": "Who is the: third",
+    "type": "PDFCheckBox",
+    "value": "[empty]"
+  },
+  {
+    "name": "Who is the: other number",
+    "type": "PDFCheckBox",
+    "value": "[empty]"
+  },
+  {
+    "name": "Who is the: other number - number",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Who is the: claimant",
+    "type": "PDFCheckBox",
+    "value": "[empty]"
+  },
+  {
+    "name": "Who is the: defendant",
+    "type": "PDFCheckBox",
+    "value": "[empty]"
+  },
+  {
+    "name": "Who is the: some other party",
+    "type": "PDFCheckBox",
+    "value": "[empty]"
+  },
+  {
+    "name": "I confirm that I have explained to my client the need to try to settle; the options available; and t",
+    "type": "PDFCheckBox",
+    "value": "[empty]"
+  },
+  {
+    "name": "A1 Attempt to settle? Yes",
+    "type": "PDFCheckBox",
+    "value": "[empty]"
+  },
+  {
+    "name": "A1 A one month stay? Yes",
+    "type": "PDFCheckBox",
+    "value": "[empty]"
+  },
+  {
+    "name": "A1 A one month stay? No",
+    "type": "PDFCheckBox",
+    "value": "[empty]"
+  },
+  {
+    "name": "A1 Attempt to settle? No",
+    "type": "PDFCheckBox",
+    "value": "[empty]"
+  },
+  {
+    "name": "A1 The reasons why I consider it inappropriate to try to settle the claim at this stage are",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "B1 Remain in the High Court? Yes",
+    "type": "PDFCheckBox",
+    "value": "[empty]"
+  },
+  {
+    "name": "B1 It should remain in the Division or List shown below",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "B1 Remain in the High Court? No",
+    "type": "PDFCheckBox",
+    "value": "[empty]"
+  },
+  {
+    "name": "B1 preferred county court hearing centre",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "B2 Particular court or hearing centre - Yes",
+    "type": "PDFCheckBox",
+    "value": "[empty]"
+  },
+  {
+    "name": "B2 Reason for hearing at named court/hearing centre",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "B2 Particular court or hearing centre - No",
+    "type": "PDFCheckBox",
+    "value": "[empty]"
+  },
+  {
+    "name": "C1 Complied with pre-action protocol? Yes",
+    "type": "PDFCheckBox",
+    "value": "[empty]"
+  },
+  {
+    "name": "C1 Complied with pre-action protocol? No",
+    "type": "PDFCheckBox",
+    "value": "[empty]"
+  },
+  {
+    "name": "I have not complied, or have only partially complied because",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "B2 Name of court/hearing centre",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "D1 Have you made any application(s)? Yes",
+    "type": "PDFCheckBox",
+    "value": "[empty]"
+  },
+  {
+    "name": "D1 Applications I have made",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "D1 Hearing date",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "D1 Have you made any application(s)? No",
+    "type": "PDFCheckBox",
+    "value": "[empty]"
+  },
+  {
+    "name": "D2 This case should be allocated to: Fast Track",
+    "type": "PDFCheckBox",
+    "value": "[empty]"
+  },
+  {
+    "name": "D2 This case should be allocated to: Intermediate Track",
+    "type": "PDFCheckBox",
+    "value": "[empty]"
+  },
+  {
+    "name": "D2 This case should be allocated to: Multi-Track",
+    "type": "PDFCheckBox",
+    "value": "[empty]"
+  },
+  {
+    "name": "D3 Is this agreed with the other party? Yes",
+    "type": "PDFCheckBox",
+    "value": "[empty]"
+  },
+  {
+    "name": "D3 Is this agreed with the other party? No",
+    "type": "PDFCheckBox",
+    "value": "[empty]"
+  },
+  {
+    "name": "D3 Give brief reasons for the proposed track",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "D4 Band 1",
+    "type": "PDFCheckBox",
+    "value": "[empty]"
+  },
+  {
+    "name": "D4 Band 2",
+    "type": "PDFCheckBox",
+    "value": "[empty]"
+  },
+  {
+    "name": "D4 Band 3",
+    "type": "PDFCheckBox",
+    "value": "[empty]"
+  },
+  {
+    "name": "D4 Band 4",
+    "type": "PDFCheckBox",
+    "value": "[empty]"
+  },
+  {
+    "name": "D4 Band - not applicable",
+    "type": "PDFCheckBox",
+    "value": "[empty]"
+  },
+  {
+    "name": "D4 bands not applicable: explain why",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "D7 If so, is an agreement likely? Yes",
+    "type": "PDFCheckBox",
+    "value": "[empty]"
+  },
+  {
+    "name": "D7 If so, is an agreement likely? No",
+    "type": "PDFCheckBox",
+    "value": "[empty]"
+  },
+  {
+    "name": "D8 issues the court needs to address",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "D9 What directions are proposed for disclosure?",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "D10 Filed and served a disclosure report? Yes",
+    "type": "PDFCheckBox",
+    "value": "[empty]"
+  },
+  {
+    "name": "D10 Filed and served a disclosure report? No",
+    "type": "PDFCheckBox",
+    "value": "[empty]"
+  },
+  {
+    "name": "D11 Have you agreed a proposal in relation to disclosure that meets the overriding objective? Yes",
+    "type": "PDFCheckBox",
+    "value": "[empty]"
+  },
+  {
+    "name": "D11 Draft order number",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "D11 Have you agreed a proposal in relation to disclosure that meets the overriding objective? No",
+    "type": "PDFCheckBox",
+    "value": "[empty]"
+  },
+  {
+    "name": "E1 Do you wish to use expert evidence at the trial or final hearing? Yes",
+    "type": "PDFCheckBox",
+    "value": "[empty]"
+  },
+  {
+    "name": "E1 Do you wish to use expert evidence at the trial or final hearing? No",
+    "type": "PDFCheckBox",
+    "value": "[empty]"
+  },
+  {
+    "name": "E2 Have you already copied any experts’ report(s) to the other party(ies)? None",
+    "type": "PDFCheckBox",
+    "value": "[empty]"
+  },
+  {
+    "name": "E2 Have you already copied any experts’ report(s) to the other party(ies)? Yes",
+    "type": "PDFCheckBox",
+    "value": "[empty]"
+  },
+  {
+    "name": "E2 Have you already copied any experts’ report(s) to the other party(ies)? No",
+    "type": "PDFCheckBox",
+    "value": "[empty]"
+  },
+  {
+    "name": "E3 Do you consider the case suitable for a single joint expert in any field? Yes",
+    "type": "PDFCheckBox",
+    "value": "[empty]"
+  },
+  {
+    "name": "E3 Do you consider the case suitable for a single joint expert in any field? No",
+    "type": "PDFCheckBox",
+    "value": "[empty]"
+  },
+  {
+    "name": "E4 Expert's name",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "E4 Expert's field",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "E4 Justification for expert and estimate of costs",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "F1 Witness name",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "F1 Witness to which facts",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "G1 How long do you estimate the trial or final hearing will take? Days",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "G1 How long do you estimate the trial or final hearing will take? Hours",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "G1 more than three days",
+    "type": "PDFCheckBox",
+    "value": "[empty]"
+  },
+  {
+    "name": "G2 Days not available? Yes",
+    "type": "PDFCheckBox",
+    "value": "[empty]"
+  },
+  {
+    "name": "G2 Days not available? No",
+    "type": "PDFCheckBox",
+    "value": "[empty]"
+  },
+  {
+    "name": "G2 Who is not available",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "G2 Dates not available",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "H I confirm Precedent H is attached",
+    "type": "PDFCheckBox",
+    "value": "[empty]"
+  },
+  {
+    "name": "I1 Do you intend to make any applications in the future? Yes",
+    "type": "PDFCheckBox",
+    "value": "[empty]"
+  },
+  {
+    "name": "I1 What you intent to apply for",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "I1 Do you intend to make any applications in the future? No",
+    "type": "PDFCheckBox",
+    "value": "[empty]"
+  },
+  {
+    "name": "I2 any other information you consider will help the judge to manage the ",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "I3 Vulnerability? Yes",
+    "type": "PDFCheckBox",
+    "value": "[empty]"
+  },
+  {
+    "name": "I3 vulnerabilities and support",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "I3 Vulnerability? No",
+    "type": "PDFCheckBox",
+    "value": "[empty]"
+  },
+  {
+    "name": "Signed by: legal representative",
+    "type": "PDFCheckBox",
+    "value": "[empty]"
+  },
+  {
+    "name": "Signed by: first",
+    "type": "PDFCheckBox",
+    "value": "[empty]"
+  },
+  {
+    "name": "Signed by: second",
+    "type": "PDFCheckBox",
+    "value": "[empty]"
+  },
+  {
+    "name": "Signed by: third",
+    "type": "PDFCheckBox",
+    "value": "[empty]"
+  },
+  {
+    "name": "Signed by: other number",
+    "type": "PDFCheckBox",
+    "value": "[empty]"
+  },
+  {
+    "name": "Signed by: other number - number",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "J Date signed: DD",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "J Date signed: MM",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "J Date signed: YYYY",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "J Signature by: name",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "J First line of address",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "J Second line of address",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "J Town or city of address",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "J County of address (optional)",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "J Postcode of address",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Signed by: claimant",
+    "type": "PDFCheckBox",
+    "value": "[empty]"
+  },
+  {
+    "name": "Signed by: defendant",
+    "type": "PDFCheckBox",
+    "value": "[empty]"
+  },
+  {
+    "name": "Signed by: some other party",
+    "type": "PDFCheckBox",
+    "value": "[empty]"
+  },
+  {
+    "name": "J Phone number",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "J DX number",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "J Your reference\r",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "J Email address",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  }
+]

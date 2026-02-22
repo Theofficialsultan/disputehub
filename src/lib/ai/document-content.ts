@@ -109,6 +109,13 @@ function buildDocumentPrompt(
   evidence: EvidenceItem[],
   caseTitle: string
 ): string {
+  // Define today's date for use in document templates
+  const today = new Date().toLocaleDateString('en-GB', { 
+    day: '2-digit', 
+    month: 'long', 
+    year: 'numeric' 
+  });
+
   const baseInfo = `
 CASE INFORMATION:
 Title: ${caseTitle}

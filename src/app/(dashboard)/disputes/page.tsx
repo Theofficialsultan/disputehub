@@ -11,11 +11,21 @@ async function DashboardData() {
     redirect("/login");
   }
 
-  // Fetch minimal stats for dashboard
+  // Fetch user info
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: {
+      firstName: true,
+      lastName: true,
+    },
+  });
+
+  // Fetch disputes with deadlines
   const disputes = await prisma.dispute.findMany({
     where: { userId },
     select: {
       id: true,
+      title: true,
       lifecycleStatus: true,
       waitingUntil: true,
       documentPlan: {
@@ -37,7 +47,7 @@ async function DashboardData() {
       (d) =>
         d.lifecycleStatus === "AWAITING_RESPONSE" ||
         d.lifecycleStatus === "DEADLINE_MISSED" ||
-        d.lifecycleStatus === "DOCUMENTS_GENERATING"
+        d.lifecycleStatus === "DOCUMENT_SENT"
     ).length,
     completedDocuments: disputes.reduce(
       (sum, d) =>
@@ -54,7 +64,22 @@ async function DashboardData() {
     ).length,
   };
 
-  return <DashboardClient stats={stats} />;
+  // Get deadlines for calendar (next 60 days)
+  const deadlines = disputes
+    .filter((d) => d.waitingUntil)
+    .map((d) => ({
+      id: d.id,
+      title: d.title,
+      date: d.waitingUntil!,
+    }));
+
+  return (
+    <DashboardClient
+      stats={stats}
+      user={user || { firstName: null, lastName: null }}
+      deadlines={deadlines}
+    />
+  );
 }
 
 export default function DisputesPage() {

@@ -70,6 +70,45 @@ export const OFFICIAL_FORM_IDS = {
   FORMAL_COMPLAINT_LETTER: "UK-COMPLAINT-LETTER-GENERAL",
   GRIEVANCE_LETTER: "UK-GRIEVANCE-LETTER-EMPLOYMENT",
   
+  // ========================================================================
+  // TIER 1: SIMPLE LETTERS (Direct Resolution)
+  // ========================================================================
+  
+  REFUND_REQUEST: "UK-REFUND-REQUEST-LETTER",
+  SECTION_75_CLAIM: "UK-SECTION-75-CREDIT-CARD-CLAIM",
+  CHARGEBACK_REQUEST: "UK-CHARGEBACK-REQUEST-LETTER",
+  WARRANTY_CLAIM: "UK-WARRANTY-CLAIM-LETTER",
+  INSURANCE_CLAIM_LETTER: "UK-INSURANCE-CLAIM-LETTER",
+  CANCELLATION_LETTER: "UK-CANCELLATION-LETTER",
+  CEASE_AND_DESIST: "UK-CEASE-AND-DESIST-LETTER",
+  
+  // ========================================================================
+  // TIER 2: COMPLEX / ADR (Pre-Action & Alternative Resolution)
+  // ========================================================================
+  
+  // Data Protection
+  SUBJECT_ACCESS_REQUEST: "UK-SAR-GDPR-REQUEST",
+  FOI_REQUEST: "UK-FOI-REQUEST-LETTER",
+  ICO_COMPLAINT: "UK-ICO-COMPLAINT-FORM",
+  
+  // Ombudsman Services
+  LGSCO_COMPLAINT: "UK-LGSCO-LOCAL-GOV-OMBUDSMAN",
+  PHSO_COMPLAINT: "UK-PHSO-PARLIAMENTARY-HEALTH-OMBUDSMAN",
+  ENERGY_OMBUDSMAN_COMPLAINT: "UK-ENERGY-OMBUDSMAN-COMPLAINT",
+  LEGAL_OMBUDSMAN_COMPLAINT: "UK-LEGAL-OMBUDSMAN-COMPLAINT",
+  
+  // Internal/Company Processes
+  INTERNAL_APPEAL_LETTER: "UK-INTERNAL-APPEAL-LETTER",
+  MEDIATION_REQUEST: "UK-MEDIATION-REQUEST-LETTER",
+  
+  // ========================================================================
+  // TIER 3: ADDITIONAL TRIBUNALS (Formal Proceedings)
+  // ========================================================================
+  
+  // Leasehold Tribunal (FTT Property)
+  LEASEHOLD_TRIBUNAL_APPLICATION: "UK-FTT-LEASEHOLD-APPLICATION",
+  SERVICE_CHARGE_DISPUTE: "UK-FTT-SERVICE-CHARGE-DISPUTE",
+  
 } as const;
 
 export type OfficialFormID = typeof OFFICIAL_FORM_IDS[keyof typeof OFFICIAL_FORM_IDS];
@@ -536,6 +575,341 @@ export const FORM_METADATA: Record<string, FormMetadata> = {
       }
     ],
     
+    validationRules: []
+  },
+  
+  "UK-CPR32-WITNESS-STATEMENT": {
+    id: "UK-CPR32-WITNESS-STATEMENT",
+    officialName: "Witness Statement (CPR 32)",
+    jurisdiction: "england_wales",
+    forum: "county_court",
+    version: "2024",
+    lastUpdated: "2024-01-01",
+    minimumLength: 300,
+    aiModel: "gpt-4o",
+    requiredSections: [],
+    structureChecks: [],
+    validationRules: []
+  },
+  
+  "UK-N1-PARTICULARS-OF-CLAIM": {
+    id: "UK-N1-PARTICULARS-OF-CLAIM",
+    officialName: "Particulars of Claim (N1 Attachment)",
+    jurisdiction: "england_wales",
+    forum: "county_court",
+    version: "2024",
+    lastUpdated: "2024-01-01",
+    minimumLength: 300,
+    aiModel: "claude-opus-4",
+    requiredSections: [],
+    structureChecks: [],
+    validationRules: []
+  },
+  
+  // ============================================================================
+  // TIER 1: SIMPLE LETTERS (Direct Resolution)
+  // ============================================================================
+  
+  "UK-REFUND-REQUEST-LETTER": {
+    id: "UK-REFUND-REQUEST-LETTER",
+    officialName: "Refund Request Letter",
+    jurisdiction: "england_wales",
+    forum: "tier_1_simple",
+    version: "2024",
+    lastUpdated: "2024-01-01",
+    minimumLength: 200,
+    aiModel: "gpt-4o",
+    requiredSections: [
+      { sectionName: "BODY", required: true, minLength: 150, mustContain: ["refund", "£"], mustNotContain: [] }
+    ],
+    structureChecks: [
+      { checkType: "has_date", pattern: "Date:", errorMessage: "Letter must have date" },
+      { checkType: "has_signature_block", pattern: "Yours (faithfully|sincerely)", errorMessage: "Letter must have closing" }
+    ],
+    validationRules: []
+  },
+  
+  "UK-SECTION-75-CREDIT-CARD-CLAIM": {
+    id: "UK-SECTION-75-CREDIT-CARD-CLAIM",
+    officialName: "Section 75 Credit Card Claim",
+    jurisdiction: "england_wales",
+    forum: "tier_1_simple",
+    version: "2024",
+    lastUpdated: "2024-01-01",
+    minimumLength: 400,
+    aiModel: "gpt-4o",
+    requiredSections: [
+      { sectionName: "SECTION_75_CLAIM", required: true, minLength: 200, mustContain: ["Section 75", "Consumer Credit Act", "jointly liable"], mustNotContain: [] }
+    ],
+    structureChecks: [
+      { checkType: "has_heading", pattern: "SECTION 75|Section 75", errorMessage: "Must reference Section 75" }
+    ],
+    validationRules: []
+  },
+  
+  "UK-CHARGEBACK-REQUEST-LETTER": {
+    id: "UK-CHARGEBACK-REQUEST-LETTER",
+    officialName: "Chargeback Request Letter",
+    jurisdiction: "england_wales",
+    forum: "tier_1_simple",
+    version: "2024",
+    lastUpdated: "2024-01-01",
+    minimumLength: 200,
+    aiModel: "gpt-4o",
+    requiredSections: [
+      { sectionName: "CHARGEBACK_REQUEST", required: true, minLength: 150, mustContain: ["chargeback", "transaction"], mustNotContain: [] }
+    ],
+    structureChecks: [],
+    validationRules: []
+  },
+  
+  "UK-WARRANTY-CLAIM-LETTER": {
+    id: "UK-WARRANTY-CLAIM-LETTER",
+    officialName: "Warranty Claim Letter",
+    jurisdiction: "england_wales",
+    forum: "tier_1_simple",
+    version: "2024",
+    lastUpdated: "2024-01-01",
+    minimumLength: 250,
+    aiModel: "gpt-4o",
+    requiredSections: [
+      { sectionName: "WARRANTY_CLAIM", required: true, minLength: 150, mustContain: ["warranty", "fault", "repair"], mustNotContain: [] }
+    ],
+    structureChecks: [],
+    validationRules: []
+  },
+  
+  "UK-INSURANCE-CLAIM-LETTER": {
+    id: "UK-INSURANCE-CLAIM-LETTER",
+    officialName: "Insurance Claim Letter",
+    jurisdiction: "england_wales",
+    forum: "tier_1_simple",
+    version: "2024",
+    lastUpdated: "2024-01-01",
+    minimumLength: 300,
+    aiModel: "gpt-4o",
+    requiredSections: [
+      { sectionName: "CLAIM_DETAILS", required: true, minLength: 200, mustContain: ["policy", "claim"], mustNotContain: [] }
+    ],
+    structureChecks: [],
+    validationRules: []
+  },
+  
+  "UK-CANCELLATION-LETTER": {
+    id: "UK-CANCELLATION-LETTER",
+    officialName: "Contract Cancellation Letter",
+    jurisdiction: "england_wales",
+    forum: "tier_1_simple",
+    version: "2024",
+    lastUpdated: "2024-01-01",
+    minimumLength: 150,
+    aiModel: "gpt-4o",
+    requiredSections: [
+      { sectionName: "CANCELLATION", required: true, minLength: 100, mustContain: ["cancel", "terminate"], mustNotContain: [] }
+    ],
+    structureChecks: [],
+    validationRules: []
+  },
+  
+  "UK-CEASE-AND-DESIST-LETTER": {
+    id: "UK-CEASE-AND-DESIST-LETTER",
+    officialName: "Cease and Desist Letter",
+    jurisdiction: "england_wales",
+    forum: "tier_1_simple",
+    version: "2024",
+    lastUpdated: "2024-01-01",
+    minimumLength: 300,
+    aiModel: "gpt-4o",
+    requiredSections: [
+      { sectionName: "CEASE_DEMAND", required: true, minLength: 200, mustContain: ["cease", "desist", "immediately"], mustNotContain: [] }
+    ],
+    structureChecks: [],
+    validationRules: []
+  },
+  
+  // ============================================================================
+  // TIER 2: COMPLEX / ADR (Pre-Action & Alternative Resolution)
+  // ============================================================================
+  
+  "UK-SAR-GDPR-REQUEST": {
+    id: "UK-SAR-GDPR-REQUEST",
+    officialName: "Subject Access Request (GDPR)",
+    jurisdiction: "england_wales",
+    forum: "tier_2_adr",
+    version: "2024",
+    lastUpdated: "2024-01-01",
+    minimumLength: 300,
+    aiModel: "gpt-4o",
+    requiredSections: [
+      { sectionName: "SAR_REQUEST", required: true, minLength: 200, mustContain: ["Subject Access Request", "GDPR", "personal data", "Article 15"], mustNotContain: [] }
+    ],
+    structureChecks: [
+      { checkType: "has_heading", pattern: "Subject Access Request|SAR", errorMessage: "Must be titled as Subject Access Request" }
+    ],
+    validationRules: []
+  },
+  
+  "UK-FOI-REQUEST-LETTER": {
+    id: "UK-FOI-REQUEST-LETTER",
+    officialName: "Freedom of Information Request",
+    jurisdiction: "england_wales",
+    forum: "tier_2_adr",
+    version: "2024",
+    lastUpdated: "2024-01-01",
+    minimumLength: 250,
+    aiModel: "gpt-4o",
+    requiredSections: [
+      { sectionName: "FOI_REQUEST", required: true, minLength: 150, mustContain: ["Freedom of Information", "request"], mustNotContain: [] }
+    ],
+    structureChecks: [],
+    validationRules: []
+  },
+  
+  "UK-ICO-COMPLAINT-FORM": {
+    id: "UK-ICO-COMPLAINT-FORM",
+    officialName: "ICO Complaint (Data Protection)",
+    jurisdiction: "england_wales",
+    forum: "tier_2_adr",
+    version: "2024",
+    lastUpdated: "2024-01-01",
+    minimumLength: 400,
+    aiModel: "gpt-4o",
+    requiredSections: [
+      { sectionName: "ICO_COMPLAINT", required: true, minLength: 300, mustContain: ["Information Commissioner", "data protection", "breach"], mustNotContain: [] }
+    ],
+    structureChecks: [],
+    validationRules: []
+  },
+  
+  "UK-LGSCO-LOCAL-GOV-OMBUDSMAN": {
+    id: "UK-LGSCO-LOCAL-GOV-OMBUDSMAN",
+    officialName: "Local Government Ombudsman Complaint",
+    jurisdiction: "england_wales",
+    forum: "tier_2_adr",
+    version: "2024",
+    lastUpdated: "2024-01-01",
+    minimumLength: 500,
+    aiModel: "gpt-4o",
+    requiredSections: [
+      { sectionName: "LGSCO_COMPLAINT", required: true, minLength: 400, mustContain: ["Local Government", "Ombudsman", "maladministration"], mustNotContain: [] }
+    ],
+    structureChecks: [],
+    validationRules: []
+  },
+  
+  "UK-PHSO-PARLIAMENTARY-HEALTH-OMBUDSMAN": {
+    id: "UK-PHSO-PARLIAMENTARY-HEALTH-OMBUDSMAN",
+    officialName: "Parliamentary & Health Service Ombudsman Complaint",
+    jurisdiction: "england_wales",
+    forum: "tier_2_adr",
+    version: "2024",
+    lastUpdated: "2024-01-01",
+    minimumLength: 500,
+    aiModel: "gpt-4o",
+    requiredSections: [
+      { sectionName: "PHSO_COMPLAINT", required: true, minLength: 400, mustContain: ["Parliamentary", "Health Service", "Ombudsman"], mustNotContain: [] }
+    ],
+    structureChecks: [],
+    validationRules: []
+  },
+  
+  "UK-ENERGY-OMBUDSMAN-COMPLAINT": {
+    id: "UK-ENERGY-OMBUDSMAN-COMPLAINT",
+    officialName: "Energy Ombudsman Complaint",
+    jurisdiction: "england_wales",
+    forum: "tier_2_adr",
+    version: "2024",
+    lastUpdated: "2024-01-01",
+    minimumLength: 400,
+    aiModel: "gpt-4o",
+    requiredSections: [
+      { sectionName: "ENERGY_COMPLAINT", required: true, minLength: 300, mustContain: ["Energy Ombudsman", "utility", "supplier"], mustNotContain: [] }
+    ],
+    structureChecks: [],
+    validationRules: []
+  },
+  
+  "UK-LEGAL-OMBUDSMAN-COMPLAINT": {
+    id: "UK-LEGAL-OMBUDSMAN-COMPLAINT",
+    officialName: "Legal Ombudsman Complaint",
+    jurisdiction: "england_wales",
+    forum: "tier_2_adr",
+    version: "2024",
+    lastUpdated: "2024-01-01",
+    minimumLength: 400,
+    aiModel: "gpt-4o",
+    requiredSections: [
+      { sectionName: "LEGAL_COMPLAINT", required: true, minLength: 300, mustContain: ["Legal Ombudsman", "solicitor", "legal services"], mustNotContain: [] }
+    ],
+    structureChecks: [],
+    validationRules: []
+  },
+  
+  "UK-INTERNAL-APPEAL-LETTER": {
+    id: "UK-INTERNAL-APPEAL-LETTER",
+    officialName: "Internal Appeal Letter",
+    jurisdiction: "england_wales",
+    forum: "tier_2_adr",
+    version: "2024",
+    lastUpdated: "2024-01-01",
+    minimumLength: 300,
+    aiModel: "gpt-4o",
+    requiredSections: [
+      { sectionName: "APPEAL", required: true, minLength: 200, mustContain: ["appeal", "decision", "reconsider"], mustNotContain: [] }
+    ],
+    structureChecks: [],
+    validationRules: []
+  },
+  
+  "UK-MEDIATION-REQUEST-LETTER": {
+    id: "UK-MEDIATION-REQUEST-LETTER",
+    officialName: "Mediation Request Letter",
+    jurisdiction: "england_wales",
+    forum: "tier_2_adr",
+    version: "2024",
+    lastUpdated: "2024-01-01",
+    minimumLength: 250,
+    aiModel: "gpt-4o",
+    requiredSections: [
+      { sectionName: "MEDIATION", required: true, minLength: 150, mustContain: ["mediation", "resolve", "dispute"], mustNotContain: [] }
+    ],
+    structureChecks: [],
+    validationRules: []
+  },
+  
+  // ============================================================================
+  // TIER 3: ADDITIONAL TRIBUNALS
+  // ============================================================================
+  
+  "UK-FTT-LEASEHOLD-APPLICATION": {
+    id: "UK-FTT-LEASEHOLD-APPLICATION",
+    officialName: "First-tier Tribunal (Property) Leasehold Application",
+    jurisdiction: "england_wales",
+    forum: "ftt_property",
+    version: "2024",
+    lastUpdated: "2024-01-01",
+    minimumLength: 500,
+    aiModel: "claude-opus-4",
+    requiredSections: [
+      { sectionName: "APPLICATION", required: true, minLength: 400, mustContain: ["First-tier Tribunal", "leasehold"], mustNotContain: [] }
+    ],
+    structureChecks: [],
+    validationRules: []
+  },
+  
+  "UK-FTT-SERVICE-CHARGE-DISPUTE": {
+    id: "UK-FTT-SERVICE-CHARGE-DISPUTE",
+    officialName: "Service Charge Dispute Application",
+    jurisdiction: "england_wales",
+    forum: "ftt_property",
+    version: "2024",
+    lastUpdated: "2024-01-01",
+    minimumLength: 500,
+    aiModel: "claude-opus-4",
+    requiredSections: [
+      { sectionName: "SERVICE_CHARGE", required: true, minLength: 400, mustContain: ["service charge", "payable", "reasonable"], mustNotContain: [] }
+    ],
+    structureChecks: [],
     validationRules: []
   }
   

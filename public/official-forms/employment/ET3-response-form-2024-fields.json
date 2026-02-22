@@ -1,0 +1,27 @@
+[
+  {
+    "name": "case number",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Work hours details",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "additional space for notes",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "date_received",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "RTF",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  }
+]

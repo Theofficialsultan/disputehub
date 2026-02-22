@@ -17,10 +17,11 @@ export async function GET() {
     });
 
     return NextResponse.json(disputes);
-  } catch (error) {
-    console.error("Error fetching disputes:", error);
+  } catch (error: any) {
+    console.error("Error fetching disputes:", error?.message || error);
+    console.error("Full error:", JSON.stringify(error, null, 2));
     return NextResponse.json(
-      { error: "Failed to fetch disputes" },
+      { error: "Failed to fetch disputes", details: error?.message },
       { status: 500 }
     );
   }

@@ -45,7 +45,7 @@ async function TimelineData() {
     )
     .sort((a, b) => b.occurredAt.getTime() - a.occurredAt.getTime());
 
-  return <TimelineClient events={allEvents} disputes={disputes} />;
+  return <TimelineClient events={allEvents} disputes={disputes as any} />;
 }
 
 export default function TimelinePage() {
@@ -54,8 +54,8 @@ export default function TimelinePage() {
       fallback={
         <div className="flex h-[50vh] items-center justify-center">
           <div className="text-center">
-            <div className="mb-4 inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-indigo-500 border-r-transparent" />
-            <p className="text-sm text-slate-400">Loading timeline...</p>
+            <div className="mb-4 inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-blue-600 border-r-transparent" />
+            <p className="text-sm text-slate-500">Loading timeline...</p>
           </div>
         </div>
       }

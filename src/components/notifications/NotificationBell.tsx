@@ -41,12 +41,12 @@ const NOTIFICATION_ICONS = {
 };
 
 const NOTIFICATION_COLORS = {
-  DOCUMENT_READY: "text-emerald-400",
-  DOCUMENT_SENT: "text-blue-400",
-  DEADLINE_APPROACHING: "text-orange-400",
-  DEADLINE_MISSED: "text-red-400",
-  FOLLOW_UP_GENERATED: "text-purple-400",
-  CASE_CLOSED: "text-slate-400",
+  DOCUMENT_READY: "text-emerald-600",
+  DOCUMENT_SENT: "text-blue-600",
+  DEADLINE_APPROACHING: "text-orange-600",
+  DEADLINE_MISSED: "text-red-600",
+  FOLLOW_UP_GENERATED: "text-purple-600",
+  CASE_CLOSED: "text-slate-500",
 };
 
 export function NotificationBell() {
@@ -106,7 +106,7 @@ export function NotificationBell() {
         <Button
           variant="ghost"
           size="icon"
-          className="relative text-slate-400 hover:text-white hover:bg-indigo-500/20"
+          className="relative text-slate-500 hover:text-slate-900 hover:bg-slate-100"
         >
           <Bell className="h-5 w-5" />
           {unreadCount > 0 && (
@@ -118,17 +118,17 @@ export function NotificationBell() {
       </DropdownMenuTrigger>
       <DropdownMenuContent
         align="end"
-        className="w-96 glass-strong border-indigo-500/20 p-0 rounded-2xl"
+        className="w-96 bg-white border border-slate-200 p-0 rounded-xl shadow-lg"
       >
-        <div className="p-4 border-b border-indigo-500/20 flex items-center justify-between">
-          <h3 className="font-semibold text-white">Notifications</h3>
+        <div className="p-4 border-b border-slate-200 flex items-center justify-between">
+          <h3 className="font-semibold text-slate-900">Notifications</h3>
           {unreadCount > 0 && (
             <Button
               size="sm"
               variant="ghost"
               onClick={markAllAsRead}
               disabled={isLoading}
-              className="text-xs text-indigo-400 hover:text-indigo-300 hover:bg-indigo-500/10"
+              className="text-xs text-blue-600 hover:text-blue-700 hover:bg-slate-100"
             >
               Mark all read
             </Button>
@@ -138,11 +138,11 @@ export function NotificationBell() {
         <div className="max-h-96 overflow-y-auto">
           {notifications.length === 0 ? (
             <div className="p-8 text-center">
-              <Bell className="h-12 w-12 text-slate-600 mx-auto mb-3" />
-              <p className="text-slate-400 text-sm">No notifications yet</p>
+              <Bell className="h-12 w-12 text-slate-400 mx-auto mb-3" />
+              <p className="text-slate-500 text-sm">No notifications yet</p>
             </div>
           ) : (
-            <div className="divide-y divide-indigo-500/10">
+            <div className="divide-y divide-slate-200">
               {notifications.map((notification) => {
                 const Icon =
                   NOTIFICATION_ICONS[
@@ -151,7 +151,7 @@ export function NotificationBell() {
                 const iconColor =
                   NOTIFICATION_COLORS[
                     notification.type as keyof typeof NOTIFICATION_COLORS
-                  ] || "text-slate-400";
+                  ] || "text-slate-500";
 
                 return (
                   <Link
@@ -163,8 +163,8 @@ export function NotificationBell() {
                       }
                       setIsOpen(false);
                     }}
-                    className={`block p-4 hover:bg-indigo-500/5 transition-colors ${
-                      !notification.read ? "bg-indigo-500/10" : ""
+                    className={`block p-4 hover:bg-slate-50 transition-colors ${
+                      !notification.read ? "bg-slate-50" : ""
                     }`}
                   >
                     <div className="flex gap-3">
@@ -172,10 +172,10 @@ export function NotificationBell() {
                         <Icon className="h-5 w-5" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm text-white mb-1">
+                        <p className="text-sm text-slate-900 mb-1">
                           {notification.message}
                         </p>
-                        <p className="text-xs text-slate-400 truncate">
+                        <p className="text-xs text-slate-500 truncate">
                           {notification.case.title}
                         </p>
                         <p className="text-xs text-slate-500 mt-1">
@@ -184,7 +184,7 @@ export function NotificationBell() {
                       </div>
                       {!notification.read && (
                         <div className="shrink-0">
-                          <div className="h-2 w-2 rounded-full bg-indigo-500" />
+                          <div className="h-2 w-2 rounded-full bg-blue-600" />
                         </div>
                       )}
                     </div>

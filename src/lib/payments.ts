@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
  * This is the SINGLE SOURCE OF TRUTH for unlock status
  * 
  * DEV ONLY: Set BYPASS_PAYWALL=true in .env to bypass payment check
- * ADMIN: If user has paymentGatewayEnabled=false, bypass payment
+ * ADMIN: If user has paymentGatewayEnabled=false, bypass payment (admin dashboard control)
  */
 export async function isDisputeUnlocked(disputeId: string): Promise<boolean> {
   console.log("🔍 [isDisputeUnlocked] Checking unlock status for dispute:", disputeId);

@@ -1,0 +1,1802 @@
+[
+  {
+    "name": "Print form 1",
+    "type": "PDFButton",
+    "value": "[empty]"
+  },
+  {
+    "name": "Reset form",
+    "type": "PDFButton",
+    "value": "[empty]"
+  },
+  {
+    "name": "Court name",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Case reference",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Judge/Master",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Case Title",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Parties",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Hearing date",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Description of fee earners - 'A'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Description of fee earners - 'B'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Description of fee earners - 'C'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Description of fee earners - 'D'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Attendances on: Party",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Personal attendances hours - 'A'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Personal attendances hourly rate - 'A'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Personal attendances amount - 'A'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Personal attendances hours - 'B'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Personal attendances hourly rate - 'B'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Personal attendances amount - 'B'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Personal attendances hours - 'C'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Personal attendances hourly rate - 'C'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Personal attendances amount - 'C'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Personal attendances hours - 'D'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Personal attendances hourly rate - 'D'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Personal attendances amount - 'D'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Letters out/emails hours - 'A'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Letters out/emails hourly rate - 'A'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Letters out/emails amount - 'A'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Letters out/emails hours - 'B'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Letters out/emails hourly rate - 'B'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Letters out/emails amount - 'B'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Letters out/emails hours - 'C'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Letters out/emails hourly rate - 'C'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Letters out/emails amount - 'C'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Letters out/emails hours - 'D'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Letters out/emails hourly rate - 'D'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Letters out/emails amount - 'D'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Telephone hours - 'A'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Telephone hourly rate - 'A'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Telephone amount - 'A'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Telephone hours - 'B'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Telephone hourly rate - 'B'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Telephone amount - 'B'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Telephone hours - 'C'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Telephone hourly rate - 'C'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Telephone amount - 'C'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Telephone hours - 'D'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Telephone hourly rate - 'D'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Telephone amount - 'D'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Personal attendance on opponents hours - 'A'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Personal attendance on opponents hourly rate - 'A'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Personal attendance on opponents amount - 'A'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Personal attendance on opponents hours - 'B'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Personal attendance on opponents hourly rate - 'B'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Personal attendance on opponents amount - 'B'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Personal attendance on opponents hours - 'C'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Personal attendance on opponents hourly rate - 'C'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Personal attendance on opponents amount - 'C'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Personal attendance on opponents hours - 'D'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Personal attendance on opponents hourly rate - 'D'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Personal attendance on opponents amount - 'D'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Letters out/emails hours opponents - 'A'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Letters out/emails with opponents hourly rate - 'A'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Letters out/emails with opponents amount - 'A'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Letters out/emails hours opponents - 'B'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Letters out/emails with opponents hourly rate - 'B'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Letters out/emails with opponents amount - 'B'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Letters out/emails hours opponents - 'C'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Letters out/emails with opponents hourly rate - 'C'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Letters out/emails with opponents amount - 'C'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Letters out/emails hours opponents - 'D'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Letters out/emails with opponents hourly rate - 'D'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Letters out/emails with opponents amount - 'D'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Telephone with opponents hours - 'A'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Telephone with opponents hourly rate - 'A'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Telephone with opponent amount - 'A'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Telephone with opponents hours - 'B'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Telephone with opponents hourly rate - 'B'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Telephone with opponent amount - 'B'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Telephone with opponents hours - 'C'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Telephone with opponents hourly rate - 'C'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Telephone with opponent amount - 'C'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Telephone with opponents hours - 'D'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Telephone with opponents hourly rate - 'D'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Telephone with opponent amount - 'D'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Personal attendances on others hours - 'A'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Personal attendance on others hourly rate - 'A'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Personal attendance on others amount - 'A'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Personal attendances on others hours - 'B'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Personal attendance on others hourly rate - 'B'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Personal attendance on others amount - 'B'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Personal attendances on others hours - 'C'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Personal attendance on others hourly rate - 'C'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Personal attendance on others amount - 'C'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Personal attendances on others hours - 'D'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Personal attendance on others hourly rate - 'D'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Personal attendance on others amount - 'D'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Letters out/emails hours others - 'A'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Letters out/emails with others hourly rate - 'A'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Letters out/emails with others amount - 'A'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Letters out/emails hours others - 'B'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Letters out/emails with others hourly rate - 'B'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Letters out/emails with others amount - 'B'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Letters out/emails hours others - 'C'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Letters out/emails with others hourly rate - 'C'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Letters out/emails with others amount - 'C'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Letters out/emails hours others - 'D'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Letters out/emails with others hourly rate - 'D'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Letters out/emails with others amount - 'D'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Telephone with others hours - 'A'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Telephone with others hourly rate - 'A'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Telephone with others amount - 'A'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Telephone with others hours - 'B'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Telephone with others hourly rate - 'B'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Telephone with others amount - 'B'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Telephone with others hours - 'C'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Telephone with others hourly rate - 'C'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Telephone with others amount - 'C'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Telephone with others hours - 'D'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Telephone with others hourly rate - 'D'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Telephone with others amount - 'D'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Site inspections etc hours - 'A'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Site inspections etc hourly rate - 'A'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Site inspections etc amount - 'A'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Site inspections etc hours - 'B'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Site inspections etc hourly rate - 'B'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Site inspections etc amount - 'B'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Site inspections etc hours - 'C'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Site inspections etc hourly rate - 'C'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Site inspections etc amount - 'C'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Site inspections etc hours - 'D'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Site inspections etc hourly rate - 'D'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Site inspections etc amount - 'D'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Work done on all documents",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Attendance at hearing hours - 'A'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Attendance at hearing hourly rate - 'A'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Attendance at hearing amount - 'A'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Attendance at hearing hours - 'B'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Attendance at hearing hourly rate - 'B'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Attendance at hearing amount - 'B'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Attendance at hearing hours - 'C'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Attendance at hearing hourly rate - 'C'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Attendance at hearing amount - 'C'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Attendance at hearing hours - 'D'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Attendance at hearing hourly rate - 'D'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Attendance at hearing amount - 'D'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Travel and waiting at hearing hours - 'A'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Travel to and waiting at hearing hourly rate - 'A'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Travel to and waiting at hearing amount - 'A'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Travel and waiting at hearing hours - 'B'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Travel to and waiting at hearing hourly rate - 'B'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Travel to and waiting at hearing amount - 'B'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Travel and waiting at hearing hours - 'C'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Travel to and waiting at hearing hourly rate - 'C'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Travel to and waiting at hearing amount - 'C'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Travel and waiting at hearing hours - 'D'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Travel to and waiting at hearing hourly rate - 'D'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Travel to and waiting at hearing amount - 'D'",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Subtotal £",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Counsel's fees - name and year of call",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Fee for [advice/conference/documents]",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Fee for hearing",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Other expenses - court fees",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Other expenses - details",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Other expenses - other",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Total A",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "VAT claimed - on solicitor's and counsel's fees",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "VAT claimed - on other expenses",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Grand Total B",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Nature of party - sign-off",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Party - party's details",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Signed - signature box",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Dated - date of signature",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Name of partner signing",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Name of firm of solicitors",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 1 - description of work",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 1 hours - A",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 1 hours - B",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 1 hours - C",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 1 hours - D",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 1 total cost",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 2 - description of work",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 2 hours - A",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 2 hours - B",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 2 hours - C",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 2 hours - D",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 2 total cost",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 3 - description of work",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 3 hours - A",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 3 hours - B",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 3 hours - C",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 3 hours - D",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 3 total cost",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 4 - description of work",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 4 hours - A",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 4 hours - B",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 4 hours - C",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 4 hours - D",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 4 total cost",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 5 - description of work",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 5 hours - A",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 5 hours - B",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 5 hours - C",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 5 hours - D",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 5 total cost",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 6 - description of work",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 6 hours - A",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 6 hours - B",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 6 hours - C",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 6 hours - D",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 6 total cost",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 7 - description of work",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 7 hours - A",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 7 hours - B",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 7 hours - C",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 7 hours - D",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 7 total cost",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 8 - description of work",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 8 hours - A",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 8 hours - B",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 8 hours - C",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 8 hours - D",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 8 total cost",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 9 - description of work",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 9 hours - A",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 9 hours - B",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 9 hours - C",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 9 hours - D",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 9 total cost",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 10 - description of work",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 10 hours - A",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 10 hours - B",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 10 hours - C",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 10 hours - D",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 10 total cost",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 11 - description of work",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 11 hours - A",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 11 hours - B",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 11 hours - C",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 11 hours - D",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 11 total cost",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 12 - description of work",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 12 hours - A",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 12 hours - B",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 12 hours - C",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 12 hours - D",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 12 total cost",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 13 - description of work",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 13 hours - A",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 13 hours - B",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 13 hours - C",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 13 hours - D",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 13 total cost",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 14 - description of work",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 14 hours - A",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 14 hours - B",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 14 hours - C",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 14 hours - D",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 14 total cost",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 15 - description of work",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 15 hours - A",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 15 hours - B",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 15 hours - C",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 15 hours - D",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 15 total cost",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 16 - description of work",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 16 hours - A",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 16 hours - B",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 16 hours - C",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 16 hours - D",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 16 total cost",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 17 - description of work",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 17 hours - A",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 17 hours - B",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 17 hours - C",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 17 hours - D",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 17 total cost",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 18 - description of work",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 18 hours - A",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 18 hours - B",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 18 hours - C",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 18 hours - D",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 18 total cost",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 19 - description of work",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 19 hours - A",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 19 hours - B",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 19 hours - C",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 19 hours - D",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 19 total cost",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 20 - description of work",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 20 hours - A",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 20 hours - B",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 20 hours - C",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 20 hours - D",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 20 total cost",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 21 - description of work",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 21 hours - A",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 21 hours - B",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 21 hours - C",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 21 hours - D",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 21 total cost",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 22 - description of work",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 22 hours - A",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 22 hours - B",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 22 hours - C",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 22 hours - D",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 22 total cost",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 23 - description of work",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 23 hours - A",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 23 hours - B",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 23 hours - C",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 23 hours - D",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 23 total cost",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 24 - description of work",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 24 hours - A",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 24 hours - B",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 24 hours - C",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 24 hours - D",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 24 total cost",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 25 - description of work",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 25 hours - A",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 25 hours - B",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 25 hours - C",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 25 hours - D",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 25 total cost",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 26 - description of work",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 26 hours - A",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 26 hours - B",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 26 hours - C",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 26 hours - D",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 26 total cost",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 27 - description of work",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 27 hours - A",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 27 hours - B",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 27 hours - C",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 27 hours - D",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 27 total cost",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 28 - description of work",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 28 hours - A",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 28 hours - B",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 28 hours - C",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 28 hours - D",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 28 total cost",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 29 - description of work",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 29 hours - A",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 29 hours - B",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 29 hours - C",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 29 hours - D",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 29 total cost",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 30 - description of work",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 30 hours - A",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 30 hours - B",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 30 hours - C",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 30 hours - D",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Item 30 total cost",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Total of all items",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Print form 2",
+    "type": "PDFButton",
+    "value": "[empty]"
+  },
+  {
+    "name": "Reset form 2",
+    "type": "PDFButton",
+    "value": "[empty]"
+  },
+  {
+    "name": "Attendance at hearing fixed costs",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Subtotal 1",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  }
+]

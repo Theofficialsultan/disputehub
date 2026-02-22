@@ -79,7 +79,7 @@ export async function POST(
     const updatedDispute = await prisma.dispute.update({
       where: { id },
       data: {
-        aiFullAnalysis: fullAnalysis,
+        aiFullAnalysis: fullAnalysis as any,
       },
     });
 

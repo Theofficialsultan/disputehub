@@ -29,11 +29,35 @@ export async function GET(
       return NextResponse.json({ error: "Case not found" }, { status: 404 });
     }
 
+    // Fields to select (exclude pdfData binary to avoid huge payloads)
+    const documentSelect = {
+      id: true,
+      planId: true,
+      caseId: true,
+      type: true,
+      title: true,
+      description: true,
+      order: true,
+      required: true,
+      status: true,
+      fileUrl: true,
+      content: true,
+      pdfFilename: true,
+      retryCount: true,
+      lastError: true,
+      isFollowUp: true,
+      validationErrors: true,
+      validationWarnings: true,
+      createdAt: true,
+      updatedAt: true,
+    };
+
     // Get document plan with all documents (proper schema relationship)
     const documentPlan = await prisma.documentPlan.findUnique({
       where: { caseId },
       include: {
         documents: {
+          select: documentSelect,
           orderBy: [
             { order: "asc" },
             { createdAt: "desc" }
@@ -48,13 +72,28 @@ export async function GET(
         caseId,
         planId: null, // Only get documents not linked to a plan
       },
+      select: documentSelect,
       orderBy: { createdAt: "desc" },
     });
 
+    // Check which documents have PDF data (without fetching the binary)
+    const docsWithPdfData = await prisma.generatedDocument.findMany({
+      where: {
+        caseId,
+        pdfData: { not: null }
+      },
+      select: { id: true }
+    });
+    const pdfDataIds = new Set(docsWithPdfData.map(d => d.id));
+
+    // Combine documents and add pdfData flag
     const allDocuments = [
       ...(documentPlan?.documents || []),
       ...directDocuments,
-    ];
+    ].map(doc => ({
+      ...doc,
+      pdfData: pdfDataIds.has(doc.id), // Boolean flag instead of binary data
+    }));
 
     return NextResponse.json({
       success: true,

@@ -1,0 +1,136 @@
+// ============================================================================
+// SCHEMA ADDITIONS FOR NEW FEATURES
+// Add these models to your main schema.prisma file
+// ============================================================================
+
+// Feature 1: Document Versioning
+model DocumentVersion {
+  id              String   @id @default(cuid())
+  documentId      String
+  version         Int
+  content         String?  @db.Text
+  fileUrl         String?
+  pdfData         Bytes?
+  changesSummary  String
+  createdAt       DateTime @default(now())
+  createdBy       String
+  
+  document        GeneratedDocument @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  
+  @@index([documentId])
+  @@index([version])
+}
+
+// Feature 2: Case Collaboration - Share Links
+model CaseShareLink {
+  id          String   @id @default(cuid())
+  caseId      String
+  token       String   @unique
+  role        CollaboratorRole @default(VIEWER)
+  expiresAt   DateTime?
+  maxUses     Int?
+  useCount    Int      @default(0)
+  createdAt   DateTime @default(now())
+  createdBy   String
+  
+  case        Dispute  @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  
+  @@index([caseId])
+  @@index([token])
+}
+
+// Feature 2: Case Collaboration - Collaborators
+model CaseCollaborator {
+  id               String   @id @default(cuid())
+  caseId           String
+  userId           String?
+  email            String
+  role             CollaboratorRole
+  inviteToken      String?
+  inviteAcceptedAt DateTime?
+  createdAt        DateTime @default(now())
+  
+  case             Dispute  @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  
+  @@index([caseId])
+  @@index([userId])
+  @@index([email])
+}
+
+enum CollaboratorRole {
+  VIEWER
+  EDITOR
+  ADMIN
+}
+
+// Feature 5: Deadline Calendar
+model CaseDeadline {
+  id               String   @id @default(cuid())
+  caseId           String
+  type             String   // DeadlineType enum value
+  title            String
+  description      String   @default("")
+  dueDate          DateTime
+  isWorkingDays    Boolean  @default(false)
+  notificationSent Boolean  @default(false)
+  completedAt      DateTime?
+  createdAt        DateTime @default(now())
+  
+  case             Dispute  @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  
+  @@index([caseId])
+  @@index([dueDate])
+  @@index([completedAt])
+}
+
+// Feature 6: Progress Gamification - User Badges
+model UserBadge {
+  id        String   @id @default(cuid())
+  userId    String
+  badgeId   String
+  earnedAt  DateTime @default(now())
+  
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, badgeId])
+  @@index([userId])
+  @@index([badgeId])
+}
+
+// Feature 8: Auto-Save Drafts
+model Draft {
+  id          String   @id @default(cuid())
+  userId      String
+  caseId      String?
+  type        String   // DraftType enum value
+  title       String
+  content     Json
+  lastSavedAt DateTime @default(now())
+  autoSaved   Boolean  @default(false)
+  expiresAt   DateTime?
+  
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  case        Dispute? @relation(fields: [caseId], references: [id], onDelete: SetNull)
+  
+  @@index([userId])
+  @@index([caseId])
+  @@index([lastSavedAt])
+  @@index([expiresAt])
+}
+
+// ============================================================================
+// RELATIONS TO ADD TO EXISTING MODELS
+// ============================================================================
+
+// Add to User model:
+// badges        UserBadge[]
+// drafts        Draft[]
+
+// Add to Dispute model:
+// shareLinks    CaseShareLink[]
+// collaborators CaseCollaborator[]
+// deadlines     CaseDeadline[]
+// drafts        Draft[]
+
+// Add to GeneratedDocument model:
+// versions      DocumentVersion[]

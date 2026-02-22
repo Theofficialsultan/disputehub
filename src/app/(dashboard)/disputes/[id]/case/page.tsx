@@ -31,6 +31,9 @@ export default async function CaseChatPage({
       phase: true, // Phase 8.5-8.7
       chatLocked: true, // Phase 8.5-8.7
       lockReason: true, // Phase 8.5-8.7
+      chatState: true, // 4-LAYER SYSTEM
+      caseSummary: true, // 4-LAYER SYSTEM
+      summaryConfirmed: true, // 4-LAYER SYSTEM
     },
   });
 

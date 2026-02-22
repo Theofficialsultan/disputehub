@@ -37,8 +37,10 @@ async function CaseDetailsData({ caseId }: { caseId: string }) {
             select: {
               id: true,
               type: true,
+              title: true,
               status: true,
               fileUrl: true,
+              content: true,
               isFollowUp: true,
               retryCount: true,
               lastError: true,
@@ -85,7 +87,7 @@ async function CaseDetailsData({ caseId }: { caseId: string }) {
     },
   });
 
-  return <CaseDetailsClient caseData={caseData} evidence={evidence} />;
+  return <CaseDetailsClient caseData={caseData as any} evidence={evidence} />;
 }
 
 export default function CaseDetailsPage({
@@ -98,8 +100,8 @@ export default function CaseDetailsPage({
       fallback={
         <div className="flex h-[50vh] items-center justify-center">
           <div className="text-center">
-            <div className="mb-4 inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-indigo-500 border-r-transparent" />
-            <p className="text-sm text-slate-400">Loading case details...</p>
+            <div className="mb-4 inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-blue-600 border-r-transparent" />
+            <p className="text-sm text-slate-500">Loading case details...</p>
           </div>
         </div>
       }

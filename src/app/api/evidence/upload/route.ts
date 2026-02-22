@@ -150,7 +150,7 @@ export async function POST(request: NextRequest) {
         console.log("[Evidence Upload] Analyzing image with Vision AI...");
         const analysis = await analyzeImageEvidence(fileUrl, {
           disputeType: caseData?.caseStrategy?.disputeType || undefined,
-          keyFacts: caseData?.caseStrategy?.keyFacts || undefined,
+          keyFacts: (caseData?.caseStrategy?.keyFacts as any) || undefined,
         });
 
         // Use AI-suggested title if it's better than user's

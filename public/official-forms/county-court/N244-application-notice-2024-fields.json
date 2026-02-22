@@ -1,0 +1,297 @@
+[
+  {
+    "name": "Name of Court",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Claim Number",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Fee account number",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Help with Fees reference number - 1",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Help with Fees reference number - 2",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Warrant number",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Claimant's name including reference",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Defendant's name, including reference",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Date of the the application",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "1. What is your name or, if you are a legal representative, the name of your firm?",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "2. Are you a - Claimant",
+    "type": "PDFCheckBox",
+    "value": "[empty]"
+  },
+  {
+    "name": "2. Are you a - Defendant",
+    "type": "PDFCheckBox",
+    "value": "[empty]"
+  },
+  {
+    "name": "2. Are you a - Legal Representative",
+    "type": "PDFCheckBox",
+    "value": "[empty]"
+  },
+  {
+    "name": "2. Are you a - Other",
+    "type": "PDFCheckBox",
+    "value": "[empty]"
+  },
+  {
+    "name": "If you have some other role - specify",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "If you are a legal representative whom do you represent?",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "3. What order are you asking the court to make and why?",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "4. Have you attached a draft of the order you are applying for? Yes",
+    "type": "PDFCheckBox",
+    "value": "[empty]"
+  },
+  {
+    "name": "4. Have you attached a draft of the order you are applying for? No",
+    "type": "PDFCheckBox",
+    "value": "[empty]"
+  },
+  {
+    "name": "5. How do you want to have this application dealt with? - at a hearing",
+    "type": "PDFCheckBox",
+    "value": "[empty]"
+  },
+  {
+    "name": "5. How do you want to have this application dealt with? - without a hearing",
+    "type": "PDFCheckBox",
+    "value": "[empty]"
+  },
+  {
+    "name": "5. How do you want to have this application dealt with? - at a remote hearing",
+    "type": "PDFCheckBox",
+    "value": "[empty]"
+  },
+  {
+    "name": "6. How long do you think the hearing will last? - number of Hours",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "6. How long do you think the hearing will last? - number of minutes",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "6. Is this time estimate agreed by all parties? Yes",
+    "type": "PDFCheckBox",
+    "value": "[empty]"
+  },
+  {
+    "name": "6. Is this time estimate agreed by all parties? No",
+    "type": "PDFCheckBox",
+    "value": "[empty]"
+  },
+  {
+    "name": "7. Give details of any fixed trial date or period",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "8. What level of Judge does your hearing need?",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "9. Who should be served with this application?",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "9a. Please give the service address, (other than details of the claimant or defendant) of any party named in question 9",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "10. What information will you be relying on, in support of your application? the statement of case",
+    "type": "PDFCheckBox",
+    "value": "[empty]"
+  },
+  {
+    "name": "10. What information will you be relying on, in support of your application? the evidence set out in the box below",
+    "type": "PDFCheckBox",
+    "value": "[empty]"
+  },
+  {
+    "name": "10. What information will you be relying on, in support of your application? the attached witness statement",
+    "type": "PDFCheckBox",
+    "value": "[empty]"
+  },
+  {
+    "name": "evidence set out in the box below",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "I believe that the facts stated in section 10 (and any continuation sheets) are true",
+    "type": "PDFCheckBox",
+    "value": "[empty]"
+  },
+  {
+    "name": "The Applicant believes that the facts stated in section 10 (and any continuation sheets) are true. I am authorised by the applicant to sign this statement",
+    "type": "PDFCheckBox",
+    "value": "[empty]"
+  },
+  {
+    "name": "Signature box",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Signed by - Applicant",
+    "type": "PDFCheckBox",
+    "value": "[empty]"
+  },
+  {
+    "name": "Signed by - Litigation friend (where applicant is a child or a Protected Party)",
+    "type": "PDFCheckBox",
+    "value": "[empty]"
+  },
+  {
+    "name": "Signed by - Applicant’s legal representative (as defined by CPR 2.3(1))",
+    "type": "PDFCheckBox",
+    "value": "[empty]"
+  },
+  {
+    "name": "Date of signature - day",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Date of signature - month",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Date of signature - year",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Name of applicant’s legal representative’s firm",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "If signing on behalf of firm or company give position or office held",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "Building and street",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "second line of address",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "town or city",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "county",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "postcode for the applicant's address",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "phone number",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "fax number",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "DX number",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "your reference",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "email address",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "in what way you or the witness are vulnerable and what steps, support or adjustments you wish the court and the judge to consider",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  },
+  {
+    "name": "11  Do you believe you, or a witness who will give evidence on your behalf, are vulnerable Yes",
+    "type": "PDFCheckBox",
+    "value": "[empty]"
+  },
+  {
+    "name": "11  Do you believe you, or a witness who will give evidence on your behalf, are vulnerable No",
+    "type": "PDFCheckBox",
+    "value": "[empty]"
+  },
+  {
+    "name": "Full name of person signing the Statement of Truth",
+    "type": "PDFTextField",
+    "value": "[empty]"
+  }
+]

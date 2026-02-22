@@ -47,7 +47,7 @@ async function DocumentsData() {
     orderBy: { updatedAt: "desc" },
   });
 
-  return <DocumentsClient disputes={disputes} />;
+  return <DocumentsClient disputes={disputes as any} />;
 }
 
 export default function DocumentsPage() {
@@ -56,8 +56,8 @@ export default function DocumentsPage() {
       fallback={
         <div className="flex h-[50vh] items-center justify-center">
           <div className="text-center">
-            <div className="mb-4 inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-indigo-500 border-r-transparent" />
-            <p className="text-sm text-slate-400">Loading documents...</p>
+            <div className="mb-4 inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-blue-600 border-r-transparent" />
+            <p className="text-sm text-slate-500">Loading documents...</p>
           </div>
         </div>
       }

@@ -13,6 +13,8 @@ import {
   Filter,
   Calendar,
   Search,
+  Upload,
+  Paperclip,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import {
@@ -118,6 +120,18 @@ const EVENT_CONFIG: Record<
     gradient: "from-yellow-500 to-amber-500",
     label: "Documents Generating",
   },
+  EVIDENCE_UPLOADED: {
+    icon: Upload,
+    color: "cyan",
+    gradient: "from-cyan-500 to-blue-500",
+    label: "Evidence Uploaded",
+  },
+  EVIDENCE_ATTACHED_TO_DOCUMENT: {
+    icon: Paperclip,
+    color: "teal",
+    gradient: "from-teal-500 to-emerald-500",
+    label: "Evidence Attached",
+  },
 };
 
 function formatRelativeTime(date: Date): string {
@@ -141,10 +155,10 @@ function TimelineEventCard({ event }: { event: TimelineEvent }) {
   return (
     <div className="relative group">
       {/* Timeline dot */}
-      <div className="absolute left-0 top-6 w-4 h-4 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 border-4 border-slate-900 z-10 group-hover:scale-125 transition-transform" />
+      <div className="absolute left-0 top-6 w-4 h-4 rounded-full bg-blue-600 border-4 border-white z-10 group-hover:scale-125 transition-transform shadow" />
       
       {/* Event card */}
-      <div className="ml-8 rounded-3xl p-6 glass-strong border border-indigo-500/20 hover:border-indigo-500/40 hover:glow-purple transition-all duration-300">
+      <div className="ml-8 rounded-3xl p-6 card-elevated border border-slate-200 hover:border-slate-300 transition-all duration-300">
         <div className="flex items-start gap-4">
           {/* Icon */}
           <div className={`p-3 rounded-2xl bg-gradient-to-br ${config.gradient} shrink-0`}>
@@ -155,8 +169,8 @@ function TimelineEventCard({ event }: { event: TimelineEvent }) {
           <div className="flex-1">
             <div className="flex items-start justify-between gap-4 mb-2">
               <div>
-                <h3 className="text-white font-semibold">{config.label}</h3>
-                <p className="text-sm text-slate-400">{event.description}</p>
+                <h3 className="text-slate-900 font-semibold">{config.label}</h3>
+                <p className="text-sm text-slate-500">{event.description}</p>
               </div>
               <span className="text-xs text-slate-500 shrink-0">
                 {formatRelativeTime(event.occurredAt)}
@@ -166,7 +180,7 @@ function TimelineEventCard({ event }: { event: TimelineEvent }) {
             {/* Case info */}
             <Link
               href={`/disputes/${event.disputeId}/case`}
-              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-sm text-indigo-300 hover:text-indigo-200 hover:bg-indigo-500/20 transition-colors"
+              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-blue-50 border border-blue-200 text-sm text-blue-700 hover:text-blue-800 hover:bg-blue-100 transition-colors"
             >
               <FileText className="h-3 w-3" />
               {event.disputeTitle}
@@ -189,13 +203,12 @@ function EmptyTimeline() {
   return (
     <div className="flex flex-col items-center justify-center py-20 px-4">
       <div className="relative mb-8">
-        <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full blur-3xl opacity-30 animate-pulse" />
-        <div className="relative p-8 rounded-3xl glass-strong border border-indigo-500/20">
-          <Clock className="h-16 w-16 text-indigo-400" />
+        <div className="relative p-8 rounded-3xl card-elevated border border-slate-200">
+          <Clock className="h-16 w-16 text-blue-600" />
         </div>
       </div>
-      <h3 className="text-3xl font-bold text-white mb-3">No events yet</h3>
-      <p className="text-slate-400 text-center max-w-md mb-8 text-lg">
+      <h3 className="text-3xl font-bold text-slate-900 mb-3">No events yet</h3>
+      <p className="text-slate-500 text-center max-w-md mb-8 text-lg">
         Start a dispute case to see events and activity in your timeline
       </p>
     </div>
@@ -247,10 +260,10 @@ export default function TimelineClient({ events, disputes }: TimelineData) {
     <div className="space-y-8 pb-8">
       {/* Header */}
       <div>
-        <h1 className="text-5xl font-bold text-white mb-3 bg-gradient-to-r from-indigo-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent">
+        <h1 className="text-5xl font-bold text-blue-600 mb-3">
           Activity Timeline
         </h1>
-        <p className="text-slate-400 text-lg">
+        <p className="text-slate-500 text-lg">
           Complete history of all your case events and activities
         </p>
       </div>
@@ -258,22 +271,22 @@ export default function TimelineClient({ events, disputes }: TimelineData) {
       {/* Filters */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="relative">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-500" />
           <Input
             placeholder="Search events..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-12 h-14 rounded-2xl glass-strong border-indigo-500/20 text-white placeholder:text-slate-500 focus:border-indigo-500/50"
+            className="pl-12 h-14 rounded-2xl card-elevated border-slate-200 text-slate-900 placeholder:text-slate-500 focus:border-blue-500"
           />
         </div>
 
         <div className="flex items-center gap-2">
-          <Filter className="h-5 w-5 text-slate-400 shrink-0" />
+          <Filter className="h-5 w-5 text-slate-500 shrink-0" />
           <Select value={eventTypeFilter} onValueChange={setEventTypeFilter}>
-            <SelectTrigger className="h-14 rounded-2xl glass-strong border-indigo-500/20 text-white">
+            <SelectTrigger className="h-14 rounded-2xl card-elevated border-slate-200 text-slate-900">
               <SelectValue placeholder="All Events" />
             </SelectTrigger>
-            <SelectContent className="glass-strong border-indigo-500/20 rounded-2xl">
+            <SelectContent className="card-elevated border-slate-200 rounded-2xl">
               <SelectItem value="all">All Events</SelectItem>
               <SelectItem value="DOCUMENT_GENERATED">Documents</SelectItem>
               <SelectItem value="DEADLINE_SET">Deadlines</SelectItem>
@@ -284,12 +297,12 @@ export default function TimelineClient({ events, disputes }: TimelineData) {
         </div>
 
         <div className="flex items-center gap-2">
-          <FileText className="h-5 w-5 text-slate-400 shrink-0" />
+          <FileText className="h-5 w-5 text-slate-500 shrink-0" />
           <Select value={caseFilter} onValueChange={setCaseFilter}>
-            <SelectTrigger className="h-14 rounded-2xl glass-strong border-indigo-500/20 text-white">
+            <SelectTrigger className="h-14 rounded-2xl card-elevated border-slate-200 text-slate-900">
               <SelectValue placeholder="All Cases" />
             </SelectTrigger>
-            <SelectContent className="glass-strong border-indigo-500/20 rounded-2xl">
+            <SelectContent className="card-elevated border-slate-200 rounded-2xl">
               <SelectItem value="all">All Cases</SelectItem>
               {disputes.map((dispute) => (
                 <SelectItem key={dispute.id} value={dispute.id}>
@@ -303,13 +316,13 @@ export default function TimelineClient({ events, disputes }: TimelineData) {
 
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="p-4 rounded-2xl glass-strong border border-indigo-500/20">
-          <p className="text-sm text-slate-400 mb-1">Total Events</p>
-          <p className="text-3xl font-bold text-white">{events.length}</p>
+        <div className="p-4 rounded-2xl card-elevated border border-slate-200">
+          <p className="text-sm text-slate-500 mb-1">Total Events</p>
+          <p className="text-3xl font-bold text-slate-900">{events.length}</p>
         </div>
-        <div className="p-4 rounded-2xl glass-strong border border-indigo-500/20">
-          <p className="text-sm text-slate-400 mb-1">This Week</p>
-          <p className="text-3xl font-bold text-white">
+        <div className="p-4 rounded-2xl card-elevated border border-slate-200">
+          <p className="text-sm text-slate-500 mb-1">This Week</p>
+          <p className="text-3xl font-bold text-slate-900">
             {events.filter((e) => {
               const diffDays = Math.floor(
                 (new Date().getTime() - new Date(e.occurredAt).getTime()) / 86400000
@@ -318,15 +331,15 @@ export default function TimelineClient({ events, disputes }: TimelineData) {
             }).length}
           </p>
         </div>
-        <div className="p-4 rounded-2xl glass-strong border border-indigo-500/20">
-          <p className="text-sm text-slate-400 mb-1">Documents</p>
-          <p className="text-3xl font-bold text-white">
+        <div className="p-4 rounded-2xl card-elevated border border-slate-200">
+          <p className="text-sm text-slate-500 mb-1">Documents</p>
+          <p className="text-3xl font-bold text-slate-900">
             {events.filter((e) => e.type === "DOCUMENT_GENERATED").length}
           </p>
         </div>
-        <div className="p-4 rounded-2xl glass-strong border border-indigo-500/20">
-          <p className="text-sm text-slate-400 mb-1">Active Cases</p>
-          <p className="text-3xl font-bold text-white">{disputes.length}</p>
+        <div className="p-4 rounded-2xl card-elevated border border-slate-200">
+          <p className="text-sm text-slate-500 mb-1">Active Cases</p>
+          <p className="text-3xl font-bold text-slate-900">{disputes.length}</p>
         </div>
       </div>
 
@@ -339,15 +352,15 @@ export default function TimelineClient({ events, disputes }: TimelineData) {
             <div key={date} className="relative">
               {/* Date header */}
               <div className="flex items-center gap-4 mb-6">
-                <div className="flex items-center gap-2 px-4 py-2 rounded-xl glass-strong border border-indigo-500/20">
-                  <Calendar className="h-4 w-4 text-indigo-400" />
-                  <span className="text-sm font-semibold text-white">{date}</span>
+                <div className="flex items-center gap-2 px-4 py-2 rounded-xl card-elevated border border-slate-200">
+                  <Calendar className="h-4 w-4 text-blue-600" />
+                  <span className="text-sm font-semibold text-slate-900">{date}</span>
                 </div>
-                <div className="flex-1 h-px bg-gradient-to-r from-indigo-500/50 to-transparent" />
+                <div className="flex-1 h-px bg-slate-200" />
               </div>
 
               {/* Timeline line */}
-              <div className="absolute left-2 top-16 bottom-0 w-0.5 bg-gradient-to-b from-indigo-500/50 to-transparent" />
+              <div className="absolute left-2 top-16 bottom-0 w-0.5 bg-slate-200" />
 
               {/* Events for this date */}
               <div className="space-y-6">

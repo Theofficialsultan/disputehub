@@ -43,7 +43,7 @@ async function AIChatData() {
   // Get user profile from Clerk
   const userName = "there"; // You can enhance this later with Clerk user data
 
-  return <AIChatClient disputes={disputes} userName={userName} />;
+  return <AIChatClient disputes={disputes as any} userName={userName} />;
 }
 
 export default function AIChatPage() {
