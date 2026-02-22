@@ -8,40 +8,63 @@ import { prisma } from "@/lib/prisma";
  * ADMIN: If user has paymentGatewayEnabled=false, bypass payment
  */
 export async function isDisputeUnlocked(disputeId: string): Promise<boolean> {
+  console.log("🔍 [isDisputeUnlocked] Checking unlock status for dispute:", disputeId);
+  
   // DEV ONLY: Bypass paywall for testing
   if (process.env.BYPASS_PAYWALL === "true") {
     console.log("⚠️  PAYWALL BYPASSED (dev mode) for dispute:", disputeId);
     return true;
   }
 
-  // Get the dispute with user info
-  const dispute = await prisma.dispute.findUnique({
-    where: { id: disputeId },
-    select: {
-      userId: true,
-      user: {
-        select: {
-          paymentGatewayEnabled: true,
+  try {
+    // Get the dispute with user info
+    const dispute = await prisma.dispute.findUnique({
+      where: { id: disputeId },
+      select: {
+        userId: true,
+        user: {
+          select: {
+            email: true,
+            paymentGatewayEnabled: true,
+          },
         },
       },
-    },
-  });
+    });
 
-  // ADMIN BYPASS: If payment gateway is disabled for this user, bypass paywall
-  if (dispute?.user?.paymentGatewayEnabled === false) {
-    console.log("💳 Payment gateway disabled for user - bypassing paywall for dispute:", disputeId);
-    return true;
-  }
-
-  // Production: Check for completed payment
-  const payment = await prisma.payment.findFirst({
-    where: {
+    console.log("📊 [isDisputeUnlocked] Dispute data:", {
       disputeId,
-      status: "COMPLETED",
-    },
-  });
+      userId: dispute?.userId,
+      userEmail: dispute?.user?.email,
+      paymentGatewayEnabled: dispute?.user?.paymentGatewayEnabled,
+    });
 
-  return !!payment;
+    // ADMIN BYPASS: If payment gateway is disabled for this user, bypass paywall
+    if (dispute?.user?.paymentGatewayEnabled === false) {
+      console.log("💳 Payment gateway disabled for user - bypassing paywall");
+      console.log("   User:", dispute.user.email);
+      console.log("   Dispute:", disputeId);
+      return true;
+    }
+
+    // Production: Check for completed payment
+    const payment = await prisma.payment.findFirst({
+      where: {
+        disputeId,
+        status: "COMPLETED",
+      },
+    });
+
+    const hasPayment = !!payment;
+    console.log("💰 [isDisputeUnlocked] Payment check:", {
+      hasPayment,
+      paymentId: payment?.id,
+    });
+
+    return hasPayment;
+  } catch (error) {
+    console.error("❌ [isDisputeUnlocked] Error:", error);
+    return false;
+  }
 }
 
 /**
